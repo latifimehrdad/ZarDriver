@@ -1,0 +1,23 @@
+<resources>
+
+    <string name="app_name">ZarDriver</string>
+
+    <string name="userName">نام کاربری</string>
+    <string name="password">رمز ورود</string>
+    <string name="forgetPassword">رمز خود را فراموش کرده اید؟</string>
+    <string name="logoContentDescription">لوگوی برنامه</string>
+    <string name="loginToAccount">ورود به حساب کاربری</string>
+    <string name="bePatient">شکیبا باشید …</string>
+
+    <string name="userNameValidationFailed">نام کاربری را وارد نمایید</string>
+    <string name="passwordValidationFailed">رمز ورود را وارد نمایید</string>
+    <string name="location">موقعیت مکانی</string>
+    <string name="gps">GPS</string>
+    <string name="internet">internet</string>
+    <string name="home">home</string>
+    <string name="p_internet">اینترنت</string>
+
+    <string name="startDriving">شروع سفر</string>
+    <string name="stopDriving">پایان سفر</string>
+
+</resources>

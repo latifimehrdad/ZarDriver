@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="pageBack">#0A081C</color>
+    <color name="gradiant">#831F35</color>
+    <color name="editBorder">#4DD0E1</color>
+    <color name="editTextColor">#001233</color>
+    <color name="buttonLoading">#F1BD10</color>
+    <color name="cardStop">#D84E4E</color>
+
+    <color name="connect">#00C853</color>
+    <color name="connect_center">#59DD90</color>
+    <color name="connect_click">#059F45</color>
+    <color name="disconnect">#D81A3F</color>
+
+    <color name="gray1">#292929</color>
+    <color name="gray2">#0E0E0E</color>
+
+    <color name="gradiant0">#CCFFFFFF</color>
+    <color name="gradiant1">#B3FFFFFF</color>
+    <color name="gradiant1_1">#4DFFFFFF</color>
+    <color name="gradiant2">#12FFFFFF</color>
+    <color name="gradiant3">#08FFFFFF</color>
+    <color name="transparent">#03FFFFFF</color>
+
+</resources>

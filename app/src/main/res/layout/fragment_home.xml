@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/back_gradiant">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/back1"
+            app:tint="@color/pageBack"
+            android:scaleType="centerCrop"
+            android:alpha="0.8"
+            android:contentDescription="@string/home" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintWidth_percent="0.75"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/chronometer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <View
+                    android:id="@+id/viewConnect1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/stroke_2"/>
+
+                <View
+                    android:id="@+id/viewConnect2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/stroke_1"
+                    android:layout_margin="@dimen/_20sdp"/>
+
+                <ImageView
+                    android:id="@+id/imageViewDriving"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/_40sdp"
+                    android:background="@drawable/back_connect_button"
+                    android:contentDescription="@string/home" />
+
+                <TextView
+                    android:id="@+id/textViewDriving"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="@id/imageViewDriving"
+                    app:layout_constraintBottom_toBottomOf="@id/imageViewDriving"
+                    app:layout_constraintStart_toStartOf="@id/imageViewDriving"
+                    app:layout_constraintEnd_toEndOf="@id/imageViewDriving"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/vazir_bold"
+                    android:textSize="@dimen/_15sdp"
+                    />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+
+        <Chronometer
+            android:id="@+id/chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:layout_marginStart="68dp"
+            android:layout_marginTop="256dp"
+            android:layout_marginEnd="68dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_25sdp"
+            android:fontFamily="@font/aaa"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/constraintFooter"
+            android:layout_marginBottom="@dimen/_25sdp" />
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintFooter"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.37"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/menu_gradiant">
+
+            <View
+                android:id="@+id/viewCenter"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.8"
+                android:background="@drawable/line_gradiant"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/viewCenter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/textViewLocation"
+                android:layout_marginBottom="@dimen/_2sdp"
+                android:text="@string/gps"
+                android:textColor="@color/gradiant0"
+                android:textSize="@dimen/_20sdp"
+                android:textStyle="bold"
+                android:fontFamily="@font/aaa"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/textViewInternet"
+                app:layout_constraintEnd_toEndOf="@id/textViewInternet"
+                app:layout_constraintBottom_toTopOf="@id/textViewInternet"
+                android:layout_marginBottom="@dimen/_2sdp"
+                android:text="@string/internet"
+                android:textColor="@color/gradiant0"
+                android:textSize="@dimen/_20sdp"
+                android:textStyle="bold"
+                android:fontFamily="@font/aaa"
+                />
+
+
+            <TextView
+                android:id="@+id/textViewLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/viewCenter"
+                android:layout_marginBottom="@dimen/_20sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@string/location"
+                android:textColor="@color/gradiant0"
+                android:textSize="@dimen/_9sdp"
+                android:fontFamily="@font/vazir_normal"
+                />
+
+
+            <TextView
+                android:id="@+id/textViewInternet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/viewCenter"
+                android:layout_marginBottom="@dimen/_20sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/p_internet"
+                android:textColor="@color/gradiant0"
+                android:textSize="@dimen/_9sdp"
+                android:fontFamily="@font/vazir_normal"
+                />
+
+
+            <ImageView
+                android:id="@+id/imageViewGps"
+                android:layout_width="@dimen/_17sdp"
+                android:layout_height="@dimen/_17sdp"
+                app:layout_constraintStart_toStartOf="@id/textViewLocation"
+                app:layout_constraintEnd_toEndOf="@id/textViewLocation"
+                app:layout_constraintTop_toBottomOf="@id/textViewLocation"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:contentDescription="@string/gps" />
+
+
+            <ImageView
+                android:id="@+id/imageViewInternet"
+                android:layout_width="@dimen/_17sdp"
+                android:layout_height="@dimen/_17sdp"
+                app:layout_constraintStart_toStartOf="@id/textViewInternet"
+                app:layout_constraintEnd_toEndOf="@id/textViewInternet"
+                app:layout_constraintTop_toBottomOf="@id/textViewInternet"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:contentDescription="@string/gps" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewAction"
+            android:layout_width="@dimen/_150sdp"
+            android:layout_height="@dimen/_150sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:cardCornerRadius="@dimen/_100sdp"
+            app:cardElevation="10dp"
+            app:cardBackgroundColor="@color/cardStop"
+            android:visibility="gone">
+
+        </androidx.cardview.widget.CardView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
