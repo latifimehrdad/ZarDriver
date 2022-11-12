@@ -16,8 +16,10 @@
     <string name="internet">internet</string>
     <string name="home">home</string>
     <string name="p_internet">اینترنت</string>
+    <string name="errorLocationIsOff">موقیعت مکانی دستگاه خود را روشن کنید</string>
 
     <string name="startDriving">شروع سفر</string>
     <string name="stopDriving">پایان سفر</string>
+
 
 </resources>

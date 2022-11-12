@@ -56,4 +56,8 @@ dependencies {
     implementation 'com.github.latifimehrdad:ZarCore:0.0.7'
 
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    implementation 'com.microsoft.signalr:signalr:1.0.0'
+
+    implementation "com.google.android.gms:play-services-location:18.0.0"
 }

@@ -2,7 +2,7 @@ package com.zarholding.zardriver.view.fragment
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +15,8 @@ import com.zarholding.zardriver.databinding.FragmentSplashBinding
 import com.zarholding.zardriver.utility.CompanionValues
 import com.zarholding.zardriver.view.activity.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 import javax.inject.Inject
 
 /**
@@ -26,6 +28,8 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
 
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
+
+    lateinit var job: Job
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
@@ -47,6 +51,7 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        Log.d("meri", "onViewCreated")
         checkUserIsLogged()
     }
     //---------------------------------------------------------------------------------------------- onViewCreated
@@ -71,16 +76,24 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- gotoFragmentLogin
     private fun gotoFragmentLogin() {
-        val handler = Handler().postDelayed({
-            findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
-        }, 2000)
+        job = CoroutineScope(Dispatchers.IO).launch {
+            delay(2000)
+            withContext(Main) {
+                findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+            }
+        }
     }
     //---------------------------------------------------------------------------------------------- gotoFragmentLogin
 
 
     //---------------------------------------------------------------------------------------------- gotoFragmentHome
     private fun gotoFragmentHome() {
-        findNavController().navigate(R.id.action_splashFragment_to_HomeFragment)
+        job = CoroutineScope(Dispatchers.IO).launch {
+            delay(2000)
+            withContext(Main) {
+                findNavController().navigate(R.id.action_splashFragment_to_HomeFragment)
+            }
+        }
     }
     //---------------------------------------------------------------------------------------------- gotoFragmentHome
 
@@ -88,6 +101,8 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- onDestroyView
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.d("meri", "onDestroyView")
+        job.cancel()
         _binding = null
     }
     //---------------------------------------------------------------------------------------------- onDestroyView

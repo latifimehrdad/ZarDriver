@@ -107,6 +107,8 @@ class LoginFragment() : Fragment(), RemoteErrorEmitter {
                             .putString(CompanionValues.sharedPreferencesToken, it.data)
                             .apply()
                         stopLoading()
+                        if (activity != null)
+                            requireActivity().onBackPressed()
                     }
                 }
             }
