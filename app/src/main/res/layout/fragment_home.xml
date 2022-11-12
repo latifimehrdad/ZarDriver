@@ -5,7 +5,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/back_gradiant">
+        android:background="@drawable/back_gradiant"
+        android:keepScreenOn="true">
 
         <ImageView
             android:layout_width="match_parent"
@@ -106,6 +107,7 @@
                 />
 
             <TextView
+                android:id="@+id/textViewGPS"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@id/viewCenter"
@@ -120,6 +122,7 @@
                 />
 
             <TextView
+                android:id="@+id/textViewInternetSetting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@id/textViewInternet"

@@ -1,27 +1,20 @@
 package com.zarholding.zardriver.view.fragment
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.util.Log
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.zar.core.enums.EnumErrorType
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zar.core.tools.manager.InternetManager
@@ -44,25 +37,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HomeFragment : Fragment(), RemoteErrorEmitter {
 
+    companion object {
+        var driving = false
+    }
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    companion object {
-        var driving = false
-        var timeSecond = 0L
-    }
 
     @Inject
     lateinit var internetConnection: InternetManager
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (driving)
-                Log.d("meri", "driving")
-            else
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-        }
-    }
 
 
     //---------------------------------------------------------------------------------------------- onCreateView
@@ -70,7 +54,6 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        MainActivity.remoteErrorEmitter = this
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -80,6 +63,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- onViewCreated
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        MainActivity.remoteErrorEmitter = this
         binding.lifecycleOwner = viewLifecycleOwner
         setListener()
         setStopDriving()
@@ -99,18 +83,37 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- setListener
     private fun setListener() {
-
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            onBackPressedCallback
-        )
-
         binding.imageViewDriving.setOnClickListener {
             if (driving)
                 stopDriving()
             else
                 startDriving()
         }
+
+        binding.textViewGPS.setOnClickListener {
+            turnGPSOn()
+        }
+
+        binding.textViewLocation.setOnClickListener {
+            turnGPSOn()
+        }
+
+        binding.imageViewGps.setOnClickListener {
+            turnGPSOn()
+        }
+
+        binding.textViewInternet.setOnClickListener {
+            turnOnInternet()
+        }
+
+        binding.textViewInternetSetting.setOnClickListener {
+            turnOnInternet()
+        }
+
+        binding.imageViewInternet.setOnClickListener {
+            turnOnInternet()
+        }
+
     }
     //---------------------------------------------------------------------------------------------- setListener
 
@@ -121,7 +124,8 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
             return
 
         if (!checkLocationEnable()) {
-            Toast.makeText(context, getString(R.string.errorLocationIsOff), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.errorLocationIsOff), Toast.LENGTH_LONG)
+                .show()
             return
         }
 
@@ -185,7 +189,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
 
     //---------------------------------------------------------------------------------------------- checkInternetConnected
-    private fun checkInternetConnected() : Boolean {
+    private fun checkInternetConnected(): Boolean {
         return when (internetConnection.connection()) {
             com.zar.core.enums.EnumInternetConnection.WIFI,
             com.zar.core.enums.EnumInternetConnection.CELLULAR -> {
@@ -202,7 +206,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
 
     //---------------------------------------------------------------------------------------------- checkLocationEnable
-    private fun checkLocationEnable() : Boolean {
+    private fun checkLocationEnable(): Boolean {
         val mLocationManager = requireContext()
             .getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -241,19 +245,6 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- setImageConnectionSrc
 
 
-
-
-
-    //---------------------------------------------------------------------------------------------- onDestroyView
-    override fun onDestroyView() {
-        super.onDestroyView()
-        if (driving)
-            requireActivity().stopService(Intent(requireActivity(), TrackingService::class.java))
-        _binding = null
-    }
-    //---------------------------------------------------------------------------------------------- onDestroyView
-
-
     //---------------------------------------------------------------------------------------------- hideSystemUI
     private fun hideSystemUI() {
         requireActivity().window.decorView.setSystemUiVisibility(
@@ -268,7 +259,6 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- hideSystemUI
 
 
-
     //---------------------------------------------------------------------------------------------- showSystemUI
     private fun showSystemUI() {
         requireActivity().window.decorView.setSystemUiVisibility(
@@ -278,5 +268,40 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         )
     }
     //---------------------------------------------------------------------------------------------- showSystemUI
+
+
+    //---------------------------------------------------------------------------------------------- turnGPSOn
+    private fun turnGPSOn() {
+        if (checkLocationEnable())
+            return
+        startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+    }
+    //---------------------------------------------------------------------------------------------- turnGPSOn
+
+
+
+    //---------------------------------------------------------------------------------------------- turnOnInternet
+    private fun turnOnInternet() {
+        if (checkInternetConnected())
+            return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            startActivity(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY))
+        else
+            startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
+    }
+    //---------------------------------------------------------------------------------------------- turnOnInternet
+
+
+
+    //---------------------------------------------------------------------------------------------- onDestroyView
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (driving)
+            requireActivity().stopService(Intent(requireActivity(), TrackingService::class.java))
+        driving = false
+        _binding = null
+    }
+    //---------------------------------------------------------------------------------------------- onDestroyView
+
 
 }

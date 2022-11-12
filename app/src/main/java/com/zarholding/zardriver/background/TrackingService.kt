@@ -9,85 +9,60 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
+import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.R
+import com.zarholding.zardriver.view.activity.MainActivity
 import com.zarholding.zardriver.view.fragment.HomeFragment
-import kotlinx.coroutines.*
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 /**
  * Created by m-latifi on 11/9/2022.
  */
 
-class TrackingService : Service() {
+@AndroidEntryPoint
+class TrackingService : Service(), RemoteErrorEmitter {
 
     private val binder: Binder = TimerBinder()
     override fun onBind(p0: Intent?): IBinder = binder
 
-
+    private lateinit var job: Job
+    private var location: Location? = null
     private var fusedLocationProvider: FusedLocationProviderClient? = null
-    private val locationRequest: LocationRequest = LocationRequest.create().apply {
-        interval = 30
-        fastestInterval = 10
-        priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-    }
-    private var locationCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            if (!HomeFragment.driving)
-                fusedLocationProvider?.removeLocationUpdates(this)
-            val locationList = locationResult.locations
-            if (locationList.isNotEmpty()) {
-                val location = locationList.last()
-                Log.d("meri", location.toString())
-            }
-        }
-    }
 
 
     //---------------------------------------------------------------------------------------------- Binder
-    inner class TimerBinder : Binder() {
-        val service: TrackingService
-            get() = this@TrackingService
-    }
+    inner class TimerBinder : Binder()
     //---------------------------------------------------------------------------------------------- Binder
 
 
     //---------------------------------------------------------------------------------------------- onCreate
     override fun onCreate() {
         super.onCreate()
+        MainActivity.remoteErrorEmitter = this
         startForeground()
+        createJob()
     }
     //---------------------------------------------------------------------------------------------- onCreate
 
 
     //---------------------------------------------------------------------------------------------- onStartCommand
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("meri", "onStartCommand")
         HomeFragment.driving = true
-/*        CoroutineScope(IO).launch {
-            repeat(1000) {
-                if (!HomeFragment.driving) {
-                    Log.d("meri", "cancel")
-                    stopForeground(true)
-                    stopSelf()
-                    cancel()
-                    delay(2000)
-                } else {
-                    HomeFragment.timeSecond++
-                    Log.d("meri", "Looper")
-                    delay(1000)
-                }
-            }
-        }*/
         fusedLocationProvider = LocationServices.getFusedLocationProviderClient(this)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
@@ -137,5 +112,57 @@ class TrackingService : Service() {
     }
     //---------------------------------------------------------------------------------------------- createNotificationChannel
 
+
+    //---------------------------------------------------------------------------------------------- locationRequest
+    private val locationRequest: LocationRequest = LocationRequest.create().apply {
+        interval = 30
+        fastestInterval = 10
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    }
+    //---------------------------------------------------------------------------------------------- locationRequest
+
+
+    //---------------------------------------------------------------------------------------------- locationCallback
+    private var locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            if (!HomeFragment.driving)
+                fusedLocationProvider?.removeLocationUpdates(this)
+            val locationList = locationResult.locations
+            if (locationList.isNotEmpty())
+                location = locationList.last()
+        }
+    }
+    //---------------------------------------------------------------------------------------------- locationCallback
+
+
+    //---------------------------------------------------------------------------------------------- createJob
+    private fun createJob() {
+        job = Job()
+        counter(job)
+    }
+    //---------------------------------------------------------------------------------------------- createJob
+
+
+    //---------------------------------------------------------------------------------------------- counter
+    private fun counter(job: Job) {
+        CoroutineScope(IO + job).launch {
+            if (location != null)
+                Log.d("meri", "send request ${location!!.latitude} - ${location!!.longitude}")
+            else
+                Log.d("meri", "Location empty")
+            delay(5000)
+            if (HomeFragment.driving)
+                createJob()
+        }
+    }
+    //---------------------------------------------------------------------------------------------- counter
+
+
+
+    //---------------------------------------------------------------------------------------------- startTimeCounter
+    private fun startTimeCounter() {
+
+    }
+    //---------------------------------------------------------------------------------------------- startTimeCounter
 
 }
