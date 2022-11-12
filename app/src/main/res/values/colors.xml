@@ -8,7 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="pageBack">#0A081C</color>
+    <color name="pageBack">#163c69</color>
     <color name="gradiant">#831F35</color>
     <color name="editBorder">#4DD0E1</color>
     <color name="editTextColor">#001233</color>
@@ -26,7 +26,7 @@
     <color name="gradiant0">#CCFFFFFF</color>
     <color name="gradiant1">#B3FFFFFF</color>
     <color name="gradiant1_1">#4DFFFFFF</color>
-    <color name="gradiant2">#12FFFFFF</color>
+    <color name="gradiant2">#4DFFFFFF</color>
     <color name="gradiant3">#08FFFFFF</color>
     <color name="transparent">#03FFFFFF</color>
 

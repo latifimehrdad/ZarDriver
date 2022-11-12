@@ -9,11 +9,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.location.Location
 import android.os.Binder
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.content.ContextCompat
@@ -23,11 +21,6 @@ import com.zarholding.zardriver.R
 import com.zarholding.zardriver.view.activity.MainActivity
 import com.zarholding.zardriver.view.fragment.HomeFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 /**
@@ -40,8 +33,6 @@ class TrackingService : Service(), RemoteErrorEmitter {
     private val binder: Binder = TimerBinder()
     override fun onBind(p0: Intent?): IBinder = binder
 
-    private lateinit var job: Job
-    private var location: Location? = null
     private var fusedLocationProvider: FusedLocationProviderClient? = null
 
 
@@ -55,7 +46,6 @@ class TrackingService : Service(), RemoteErrorEmitter {
         super.onCreate()
         MainActivity.remoteErrorEmitter = this
         startForeground()
-        createJob()
     }
     //---------------------------------------------------------------------------------------------- onCreate
 
@@ -129,40 +119,10 @@ class TrackingService : Service(), RemoteErrorEmitter {
                 fusedLocationProvider?.removeLocationUpdates(this)
             val locationList = locationResult.locations
             if (locationList.isNotEmpty())
-                location = locationList.last()
+                HomeFragment.location = locationList.last()
         }
     }
     //---------------------------------------------------------------------------------------------- locationCallback
 
-
-    //---------------------------------------------------------------------------------------------- createJob
-    private fun createJob() {
-        job = Job()
-        counter(job)
-    }
-    //---------------------------------------------------------------------------------------------- createJob
-
-
-    //---------------------------------------------------------------------------------------------- counter
-    private fun counter(job: Job) {
-        CoroutineScope(IO + job).launch {
-            if (location != null)
-                Log.d("meri", "send request ${location!!.latitude} - ${location!!.longitude}")
-            else
-                Log.d("meri", "Location empty")
-            delay(5000)
-            if (HomeFragment.driving)
-                createJob()
-        }
-    }
-    //---------------------------------------------------------------------------------------------- counter
-
-
-
-    //---------------------------------------------------------------------------------------------- startTimeCounter
-    private fun startTimeCounter() {
-
-    }
-    //---------------------------------------------------------------------------------------------- startTimeCounter
 
 }
