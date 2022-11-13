@@ -2,7 +2,6 @@ package com.zarholding.zardriver.view.fragment
 
 import android.content.Context
 import android.content.Intent
-import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -15,16 +14,13 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.zar.core.enums.EnumErrorType
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zar.core.tools.manager.InternetManager
 import com.zarholding.zardriver.R
 import com.zarholding.zardriver.background.TrackingService
 import com.zarholding.zardriver.databinding.FragmentHomeBinding
-import com.zarholding.zardriver.model.request.TrackDriverRequestModel
 import com.zarholding.zardriver.view.activity.MainActivity
-import com.zarholding.zardriver.viewmodel.TrackingDriverViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
@@ -42,7 +38,6 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     companion object {
         var driving = false
-        var location: Location? = null
     }
 
     private var _binding: FragmentHomeBinding? = null
@@ -52,8 +47,6 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     @Inject
     lateinit var internetConnection: InternetManager
-
-    private val trackingDriverViewModel : TrackingDriverViewModel by viewModels()
 
 
     //---------------------------------------------------------------------------------------------- onCreateView
@@ -180,9 +173,6 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         binding.chronometer.base = SystemClock.elapsedRealtime()
         binding.chronometer.start()
         binding.chronometer.setOnChronometerTickListener {
-            counter++
-            if (counter >= 5)
-                requestTrackDriver()
         }
         hideSystemUI()
     }
@@ -304,23 +294,6 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     }
     //---------------------------------------------------------------------------------------------- turnOnInternet
 
-
-
-    //---------------------------------------------------------------------------------------------- requestTrackDriver
-    private fun requestTrackDriver() {
-        counter = 0
-        location?.let { loc ->
-            val model = TrackDriverRequestModel(loc.latitude, loc.longitude)
-            trackingDriverViewModel.requestTrackDriver(model).observe(viewLifecycleOwner){ response ->
-                response?.let {
-                    if (it.hasError) {
-                        onError(EnumErrorType.UNKNOWN, it.message)
-                    }
-                }
-            }
-        }
-    }
-    //---------------------------------------------------------------------------------------------- requestTrackDriver
 
 
 

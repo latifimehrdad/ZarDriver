@@ -4,23 +4,32 @@ import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.os.Binder
-import android.os.IBinder
+import android.location.Location
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.*
 import com.google.android.gms.location.*
+import com.zar.core.enums.EnumErrorType
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.R
 import com.zarholding.zardriver.view.activity.MainActivity
 import com.zarholding.zardriver.view.fragment.HomeFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import javax.inject.Inject
+import androidx.lifecycle.observe
+import com.zarholding.zardriver.model.request.TrackDriverRequestModel
+import com.zarholding.zardriver.repository.TrackDriverRepository
+import com.zarholding.zardriver.viewmodel.TrackingDriverViewModel
 
 
 /**
@@ -28,24 +37,26 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 
 @AndroidEntryPoint
-class TrackingService : Service(), RemoteErrorEmitter {
+class TrackingService : LifecycleService(), RemoteErrorEmitter {
 
-    private val binder: Binder = TimerBinder()
-    override fun onBind(p0: Intent?): IBinder = binder
+    lateinit var job: Job
+    private var location: Location? = null
 
     private var fusedLocationProvider: FusedLocationProviderClient? = null
 
+    @Inject
+    lateinit var repository: TrackDriverRepository
 
-    //---------------------------------------------------------------------------------------------- Binder
-    inner class TimerBinder : Binder()
-    //---------------------------------------------------------------------------------------------- Binder
+    lateinit var trackingDriverViewModel: TrackingDriverViewModel
 
 
     //---------------------------------------------------------------------------------------------- onCreate
     override fun onCreate() {
         super.onCreate()
+        trackingDriverViewModel = TrackingDriverViewModel(repository)
         MainActivity.remoteErrorEmitter = this
         startForeground()
+        createJob()
     }
     //---------------------------------------------------------------------------------------------- onCreate
 
@@ -119,10 +130,58 @@ class TrackingService : Service(), RemoteErrorEmitter {
                 fusedLocationProvider?.removeLocationUpdates(this)
             val locationList = locationResult.locations
             if (locationList.isNotEmpty())
-                HomeFragment.location = locationList.last()
+                location = locationList.last()
         }
     }
     //---------------------------------------------------------------------------------------------- locationCallback
 
+
+    //---------------------------------------------------------------------------------------------- createJob
+    private fun createJob() {
+        job = Job()
+        counter(job)
+    }
+    //---------------------------------------------------------------------------------------------- createJob
+
+
+    //---------------------------------------------------------------------------------------------- counter
+    private fun counter(job: Job) {
+        CoroutineScope(IO + job).launch {
+            location?.let {
+                Log.d("meri", "location : ${it.latitude} - ${it.longitude}")
+            }
+            delay(5000)
+            if (HomeFragment.driving) {
+                createJob()
+                withContext(Main) {
+                    requestTrackDriver()
+                }
+            } else
+                job.cancel()
+        }
+    }
+    //---------------------------------------------------------------------------------------------- counter
+
+
+    //---------------------------------------------------------------------------------------------- onError
+    override fun onError(errorType: EnumErrorType, message: String) {
+        Log.d("meri", message)
+    }
+    //---------------------------------------------------------------------------------------------- onError
+
+
+
+    //---------------------------------------------------------------------------------------------- requestTrackDriver
+    private fun requestTrackDriver() {
+        location?.let { loc ->
+            val model = TrackDriverRequestModel(1,loc.latitude.toFloat(), loc.longitude.toFloat())
+            trackingDriverViewModel.requestTrackDriver(model).observe(this@TrackingService){ response ->
+                response?.let {
+                    onError(EnumErrorType.UNKNOWN, it.message)
+                }
+            }
+        }
+    }
+    //---------------------------------------------------------------------------------------------- requestTrackDriver
 
 }

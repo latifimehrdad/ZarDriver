@@ -13,13 +13,12 @@ import retrofit2.http.Url
  * Created by m-latifi on 11/8/2022.
  */
 
-interface ApiInterface {
+interface ApiInterface8081 {
 
     companion object {
         const val api = "/Api"
         const val v1 = "$api/V1"
         const val account = "$v1/Account"
-        const val tracking = "$v1/DriverTracking"
 
     }
 
@@ -27,13 +26,5 @@ interface ApiInterface {
     suspend fun requestLogin(
         @Body login: LoginRequestModel
     ): LoginResponseModel
-
-
-    @POST("$tracking/track-driver")
-    suspend fun requestTrackDriver(
-        @Url url: String,
-        @Body track: TrackDriverRequestModel
-    ): BaseResponseAbstractModel
-
 
 }

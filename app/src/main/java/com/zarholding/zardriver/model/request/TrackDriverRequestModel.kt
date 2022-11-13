@@ -5,6 +5,7 @@ package com.zarholding.zardriver.model.request
  */
 
 data class TrackDriverRequestModel(
-    val lat : Double,
-    val long : Double
+    val id : Int,
+    val lat : Float,
+    val long : Float
 )
