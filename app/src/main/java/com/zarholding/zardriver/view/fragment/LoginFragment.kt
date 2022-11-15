@@ -24,7 +24,7 @@ import javax.inject.Inject
  */
 
 @AndroidEntryPoint
-class LoginFragment() : Fragment(), RemoteErrorEmitter {
+class LoginFragment : Fragment(), RemoteErrorEmitter {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
@@ -65,51 +65,63 @@ class LoginFragment() : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- onError
 
 
-
     //---------------------------------------------------------------------------------------------- setClickOnViews
     private fun setClickOnViews() {
 
         binding.editTextUserName.setOnClickListener {
-            binding.layoutUserName.error = null
+            binding.textInputLayoutUserName.error = null
         }
 
         binding.editTextPassword.setOnClickListener {
-            binding.layoutPassword.error = null
+            binding.textInputLayoutPasscode.error = null
         }
 
-        binding.buttonLogin.setOnClickListener {
-            requestLogin()
-        }
+        binding.buttonLogin.setOnClickListener { checkEmptyValueForLogin() }
 
     }
     //---------------------------------------------------------------------------------------------- setClickOnViews
 
 
+    //---------------------------------------------------------------------------------------------- checkEmptyValueForLogin
+    private fun checkEmptyValueForLogin() {
+
+        if (loginViewModel.loadingLiveDate.value == true)
+            return
+
+        if (loginViewModel.userName.isNullOrEmpty()) {
+            binding.textInputLayoutUserName.error = getString(R.string.userNameValidationFailed)
+            return
+        }
+        if (loginViewModel.passcode.isNullOrEmpty()) {
+            binding.textInputLayoutPasscode.error = getString(R.string.passwordValidationFailed)
+            return
+        }
+        requestLogin()
+    }
+    //---------------------------------------------------------------------------------------------- checkEmptyValueForLogin
 
 
     //---------------------------------------------------------------------------------------------- requestLogin
     private fun requestLogin() {
-        if (loginViewModel.loadingLiveDate.value == true)
-            return
-        if (checkValidation()) {
-            val model = LoginRequestModel(
-                loginViewModel.userName!!,
-                loginViewModel.password!!
-            )
-            startLoading();
-            loginViewModel.requestLogin(model).observe(viewLifecycleOwner) { response ->
-                response?.let {
-                    if (it.hasError) {
-                        onError(EnumErrorType.UNKNOWN, it.message)
-                    } else {
-                        sharedPreferences
-                            .edit()
-                            .putString(CompanionValues.sharedPreferencesToken, it.data)
-                            .apply()
-                        stopLoading()
-                        if (activity != null)
-                            requireActivity().onBackPressed()
-                    }
+
+        val model = LoginRequestModel(
+            loginViewModel.userName!!,
+            loginViewModel.passcode!!
+        )
+        startLoading()
+        loginViewModel.requestLogin(model).observe(viewLifecycleOwner) { response ->
+            stopLoading()
+            response?.let {
+                if (it.hasError) {
+                    onError(EnumErrorType.UNKNOWN, it.message)
+                } else {
+                    sharedPreferences
+                        .edit()
+                        .putString(CompanionValues.sharedPreferencesToken, it.data)
+                        .apply()
+                    stopLoading()
+                    if (activity != null)
+                        requireActivity().onBackPressed()
                 }
             }
         }
@@ -117,28 +129,10 @@ class LoginFragment() : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- requestLogin
 
 
-    //---------------------------------------------------------------------------------------------- checkValidation
-    private fun checkValidation(): Boolean {
-        binding.layoutUserName.error = null
-        binding.layoutPassword.error = null
-        if (loginViewModel.userName.isNullOrEmpty()) {
-            binding.layoutUserName.error = getString(R.string.userNameValidationFailed)
-            return false
-        }
-
-        if (loginViewModel.password.isNullOrEmpty()) {
-            binding.layoutPassword.error = getString(R.string.passwordValidationFailed)
-            return false
-        }
-        return true
-    }
-    //---------------------------------------------------------------------------------------------- checkValidation
-
-
     //---------------------------------------------------------------------------------------------- startLoading
     private fun startLoading() {
-        binding.layoutUserName.error = null
-        binding.layoutPassword.error = null
+        binding.textInputLayoutUserName.error = null
+        binding.textInputLayoutPasscode.error = null
         binding.editTextUserName.isEnabled = false
         binding.editTextPassword.isEnabled = false
         loginViewModel.loadingLiveDate.value = true
@@ -153,7 +147,6 @@ class LoginFragment() : Fragment(), RemoteErrorEmitter {
         loginViewModel.loadingLiveDate.value = false
     }
     //---------------------------------------------------------------------------------------------- stopLoading
-
 
 
     //---------------------------------------------------------------------------------------------- onDestroyView

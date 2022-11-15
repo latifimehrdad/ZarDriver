@@ -15,7 +15,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(var repository: LoginRepository) : ViewModel() {
 
     var userName: String? = null
-    var password: String? = null
+    var passcode: String? = null
     var loadingLiveDate = MutableLiveData(false)
 
     //---------------------------------------------------------------------------------------------- requestLogin

@@ -19,12 +19,12 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutUserName"
+                android:id="@+id/textInputLayoutUserName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/layoutPassword"
+                app:layout_constraintBottom_toTopOf="@id/textInputLayoutPasscode"
                 android:layout_marginBottom="@dimen/_10sdp"
                 app:layout_constraintWidth_percent="0.7"
                 app:boxCornerRadiusBottomEnd="@dimen/_5sdp"
@@ -53,11 +53,11 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutPassword"
+                android:id="@+id/textInputLayoutPasscode"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="@id/layoutUserName"
-                app:layout_constraintStart_toStartOf="@id/layoutUserName"
+                app:layout_constraintEnd_toEndOf="@id/textInputLayoutUserName"
+                app:layout_constraintStart_toStartOf="@id/textInputLayoutUserName"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:boxCornerRadiusBottomEnd="@dimen/_5sdp"
@@ -79,7 +79,7 @@
                     android:maxLength="20"
                     android:textColor="@color/white"
                     android:singleLine="true"
-                    android:text="@={viewModel.password}"
+                    android:text="@={viewModel.passcode}"
                     android:textSize="@dimen/_10sdp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -88,8 +88,8 @@
                 android:id="@+id/forgetPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/layoutPassword"
-                app:layout_constraintStart_toStartOf="@id/layoutPassword"
+                app:layout_constraintTop_toBottomOf="@id/textInputLayoutPasscode"
+                app:layout_constraintStart_toStartOf="@id/textInputLayoutPasscode"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_10sdp"
                 android:layout_margin="@dimen/_2sdp"
@@ -101,7 +101,7 @@
                 android:layout_height="@dimen/_65sdp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/layoutUserName"
+                app:layout_constraintBottom_toTopOf="@id/textInputLayoutUserName"
                 android:layout_marginBottom="@dimen/_20sdp"
                 android:contentDescription="@string/logoContentDescription" />
 
@@ -109,8 +109,8 @@
                 android:id="@+id/buttonLogin"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@id/layoutUserName"
-                app:layout_constraintEnd_toEndOf="@id/layoutUserName"
+                app:layout_constraintStart_toStartOf="@id/textInputLayoutUserName"
+                app:layout_constraintEnd_toEndOf="@id/textInputLayoutUserName"
                 app:layout_constraintTop_toBottomOf="@id/forgetPassword"
                 android:layout_marginTop="@dimen/_15sdp"
                 android:textSize="@dimen/_12sdp"

@@ -11,7 +11,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/zar_back"
+            android:src="@drawable/zar_background"
             android:scaleType="fitXY"
             android:alpha="0.3"
             android:contentDescription="@string/home" />
