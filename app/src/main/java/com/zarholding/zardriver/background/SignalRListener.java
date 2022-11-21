@@ -1,8 +1,12 @@
 package com.zarholding.zardriver.background;
 
+import android.os.Handler;
+import android.util.Log;
+
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 import com.microsoft.signalr.HubConnectionState;
+
 
 /**
  * Created by m-latifi on 11/11/2022.
@@ -11,17 +15,17 @@ import com.microsoft.signalr.HubConnectionState;
 public class SignalRListener {
 
     private static SignalRListener instance;
-    private final HubConnection hubConnection;
+    private HubConnection hubConnection;
     private final RemoteSignalREmitter remoteSignalREmitter;
 
 
     //---------------------------------------------------------------------------------------------- SignalRListener
     public SignalRListener(RemoteSignalREmitter remoteSignalREmitter) {
         this.remoteSignalREmitter = remoteSignalREmitter;
-        hubConnection = HubConnectionBuilder.create("http://10.0.2.2:5000/movehub").build();
-        hubConnection.on("ReceiveNewPosition", (receive -> {
+        hubConnection = HubConnectionBuilder.create("http://192.168.50.113:1364/realtimenotification?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiVXNlck5hbWUiOiJzdXBlcmFkbWluIiwiUGVyc29ubmVsTnVtYmVyIjoiU3VwZXJBZG1pbiIsIkZ1bGxOYW1lIjoiU3VwZXIgQWRtaW4iLCJSb2xlcyI6IlJlZ2lzdGVyZWRVc2VyIiwibmJmIjoxNjY5MDI0OTM1LCJleHAiOjE2NjkxMTEzMzUsImlhdCI6MTY2OTAyNDkzNX0.Z2Msyx3mpgujVodgcN8-iY-ai3mEq0HLniStUYDHOEU").build();
+/*        hubConnection.on("ReceiveNewPosition", (receive) -> {
             this.remoteSignalREmitter.onReceiveSignalR("receive : " + receive);
-        }), Boolean.class);
+        }, Boolean.class);*/
     }
     //---------------------------------------------------------------------------------------------- SignalRListener
 
@@ -37,10 +41,23 @@ public class SignalRListener {
 
     //---------------------------------------------------------------------------------------------- startConnection
     public void startConnection() {
-        if (hubConnection.getConnectionState() == HubConnectionState.DISCONNECTED)
-            hubConnection.start();
+        Handler handler = new Handler();
+        handler.postDelayed(() ->{
+            if (hubConnection.getConnectionState() == HubConnectionState.DISCONNECTED)
+                hubConnection
+                        .start()
+                        .doOnError(throwable -> remoteSignalREmitter.onErrorConnectToSignalR())
+                        .doOnComplete(remoteSignalREmitter::onConnectToSignalR)
+                        .blockingAwait();
+        }, 2000);
+        hubConnection.onClosed(exception -> {
+            Log.i("meri", "onClosed");
+            remoteSignalREmitter.onReConnectToSignalR();
+        });
     }
     //---------------------------------------------------------------------------------------------- startConnection
+
+
 
 
     //---------------------------------------------------------------------------------------------- stopConnection
@@ -61,9 +78,9 @@ public class SignalRListener {
 
 
     //---------------------------------------------------------------------------------------------- sendToServer
-    public void sendToServer(float lat, float lon) {
+    public void sendToServer(String serviceId, String lat, String lon) {
         if (hubConnection.getConnectionState() == HubConnectionState.CONNECTED)
-            hubConnection.send("ReceiveNewPosition", lat, lon);
+            hubConnection.send("TrackDriver", serviceId, lat, lon);
     }
     //---------------------------------------------------------------------------------------------- sendToServer
 

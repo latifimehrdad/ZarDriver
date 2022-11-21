@@ -19,6 +19,10 @@
     <color name="connect_center">#59DD90</color>
     <color name="connect_click">#059F45</color>
     <color name="disconnect">#D81A3F</color>
+    <color name="waiting">#FFA200</color>
+    <color name="waitingClick">#D68903</color>
+    <color name="reconnect">#DD0202</color>
+    <color name="reconnectClick">#B10101</color>
 
     <color name="gray">#8A99A7</color>
     <color name="gray1">#292929</color>

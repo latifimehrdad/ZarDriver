@@ -16,73 +16,39 @@ import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.google.android.gms.location.*
-import com.zar.core.enums.EnumErrorType
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.R
+import com.zarholding.zardriver.utility.EnumTripStatus
 import com.zarholding.zardriver.view.activity.MainActivity
 import com.zarholding.zardriver.view.fragment.HomeFragment
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import javax.inject.Inject
-import androidx.lifecycle.observe
-import com.zarholding.zardriver.model.request.TrackDriverRequestModel
-import com.zarholding.zardriver.repository.TrackDriverRepository
-import com.zarholding.zardriver.viewmodel.TrackingDriverViewModel
 
 
 /**
  * Created by m-latifi on 11/9/2022.
  */
 
-@AndroidEntryPoint
 class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmitter {
 
-    lateinit var job: Job
     private var location: Location? = null
     lateinit var signalRListener: SignalRListener
 
-    //    private lateinit var locationManager: GeoLocationManager
     private var fusedLocationProvider: FusedLocationProviderClient? = null
-
-    @Inject
-    lateinit var repository: TrackDriverRepository
-
-    lateinit var trackingDriverViewModel: TrackingDriverViewModel
 
 
     //---------------------------------------------------------------------------------------------- onCreate
     override fun onCreate() {
         super.onCreate()
-        trackingDriverViewModel = TrackingDriverViewModel(repository)
         MainActivity.remoteErrorEmitter = this
-//        locationManager = GeoLocationManager(applicationContext)
         signalRListener = SignalRListener.getInstance(this@TrackingService)
         startForeground()
-//        createJob()
     }
     //---------------------------------------------------------------------------------------------- onCreate
 
 
     //---------------------------------------------------------------------------------------------- onStartCommand
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        HomeFragment.driving = true
-        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(this)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            if (!signalRListener.isConnection)
-                signalRListener.startConnection()
-
-//            locationManager.startLocationTracking(locationCallback)
-
-            fusedLocationProvider?.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
-            )
-        }
+        HomeFragment.tripStatus = EnumTripStatus.WAITING
+        startSignalR()
         return super.onStartCommand(intent, flags, startId)
     }
     //---------------------------------------------------------------------------------------------- onStartCommand
@@ -102,6 +68,32 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
         startForeground(101, notification)
     }
     //---------------------------------------------------------------------------------------------- startForeground
+
+
+
+    //---------------------------------------------------------------------------------------------- startSignalR
+    private fun startSignalR() {
+        if (!signalRListener.isConnection)
+            signalRListener.startConnection()
+    }
+    //---------------------------------------------------------------------------------------------- startSignalR
+
+
+    //---------------------------------------------------------------------------------------------- startLocationProvider
+    private fun startLocationProvider() {
+        HomeFragment.tripStatus = EnumTripStatus.START
+        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(this)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationProvider?.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+        }
+    }
+    //---------------------------------------------------------------------------------------------- startLocationProvider
 
 
     //---------------------------------------------------------------------------------------------- createNotificationChannel
@@ -134,18 +126,23 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
     //---------------------------------------------------------------------------------------------- locationCallback
     private var locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            if (!HomeFragment.driving) {
+            if (HomeFragment.tripStatus != EnumTripStatus.START) {
                 fusedLocationProvider?.removeLocationUpdates(this)
                 if (signalRListener.isConnection)
                     signalRListener.stopConnection()
-//                locationManager.stopLocationTracking()
             }
             val locationList = locationResult.locations
             if (locationList.isNotEmpty())
                 location = locationList.last()
             location?.let {
                 if (signalRListener.isConnection)
-                    signalRListener.sendToServer(it.latitude.toFloat(), it.longitude.toFloat())
+                    signalRListener.sendToServer(
+                        "service10",
+                        it.latitude.toString(),
+                        it.longitude.toString()
+                    )
+                else
+                    Log.d("meri", "signalRListener is disconnect")
                 Log.d("meri", "location : ${it.latitude} - ${it.longitude}")
             }
         }
@@ -153,56 +150,26 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
     //---------------------------------------------------------------------------------------------- locationCallback
 
 
-    //---------------------------------------------------------------------------------------------- createJob
-    private fun createJob() {
-        job = Job()
-        counter(job)
+    //---------------------------------------------------------------------------------------------- onConnectToSignalR
+    override fun onConnectToSignalR() {
+        startLocationProvider()
     }
-    //---------------------------------------------------------------------------------------------- createJob
+    //---------------------------------------------------------------------------------------------- onConnectToSignalR
 
 
-    //---------------------------------------------------------------------------------------------- counter
-    private fun counter(job: Job) {
-        CoroutineScope(IO + job).launch {
-            delay(5000)
-            if (HomeFragment.driving) {
-                createJob()
-                withContext(Main) {
-//                    requestTrackDriver()
-                }
-            } else {
-//                locationManager.stopLocationTracking()
-                job.cancel()
-            }
-        }
+
+    //---------------------------------------------------------------------------------------------- onErrorConnectToSignalR
+    override fun onErrorConnectToSignalR() {
+        HomeFragment.tripStatus = EnumTripStatus.STOP
     }
-    //---------------------------------------------------------------------------------------------- counter
+    //---------------------------------------------------------------------------------------------- onErrorConnectToSignalR
 
 
-    //---------------------------------------------------------------------------------------------- onError
-    override fun onError(errorType: EnumErrorType, message: String) {
-        Log.d("meri", message)
+
+    //---------------------------------------------------------------------------------------------- onReConnectToSignalR
+    override fun onReConnectToSignalR() {
+        HomeFragment.tripStatus = EnumTripStatus.WAITING
     }
-    //---------------------------------------------------------------------------------------------- onError
-
-
-    //---------------------------------------------------------------------------------------------- requestTrackDriver
-    private fun requestTrackDriver() {
-        location?.let { loc ->
-            val model = TrackDriverRequestModel(1, loc.latitude.toFloat(), loc.longitude.toFloat())
-            trackingDriverViewModel.requestTrackDriver(model)
-                .observe(this@TrackingService) { response ->
-                    response?.let {
-                        onError(EnumErrorType.UNKNOWN, it.message)
-                    }
-                }
-        }
-    }
-    //---------------------------------------------------------------------------------------------- requestTrackDriver
-
-
-    override fun onReceiveSignalR(message: String) {
-        TODO("Not yet implemented")
-    }
+    //---------------------------------------------------------------------------------------------- onReConnectToSignalR
 
 }

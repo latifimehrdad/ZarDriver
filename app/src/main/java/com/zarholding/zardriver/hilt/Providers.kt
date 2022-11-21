@@ -3,7 +3,6 @@ package com.zarholding.zardriver.hilt
 import com.google.gson.Gson
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.api.ApiInterface8081
-import com.zarholding.zardriver.api.ApiInterface9090
 import com.zarholding.zardriver.view.activity.MainActivity
 import dagger.Module
 import dagger.Provides
@@ -52,27 +51,5 @@ class Providers {
     }
     //---------------------------------------------------------------------------------------------- provideApiService
 
-
-
-    //---------------------------------------------------------------------------------------------- provideRetrofit
-    @Provides
-    @Singleton
-    @Named("Server9090")
-    fun provideRetrofit(client: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.50.153:9090")
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .client(client)
-        .build()
-    //---------------------------------------------------------------------------------------------- provideRetrofit
-
-
-
-    //---------------------------------------------------------------------------------------------- provideApiService9090
-    @Provides
-    @Singleton
-    fun provideApiService9090(@Named("Server9090") retrofit: Retrofit): ApiInterface9090 {
-        return retrofit.create(ApiInterface9090::class.java)
-    }
-    //---------------------------------------------------------------------------------------------- provideApiService9090
 
 }

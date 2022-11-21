@@ -3,10 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable-v24/ic_waiting.xml" value="0.169" />
         <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/back_button.xml" value="0.1615" />
         <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/back_connect_button.xml" value="0.1615" />
         <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/back_disconnect_button.xml" value="0.1615" />
         <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/back_gradiant.xml" value="0.1615" />
+        <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/back_reconnect_button.xml" value="0.169" />
+        <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/back_waiting_button.xml" value="0.169" />
         <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/ic_connect.xml" value="0.1615" />
         <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/ic_disconnect.xml" value="0.1615" />
         <entry key="..\:/AndroidSource/ZarDriver/app/src/main/res/drawable/line_gradiant.xml" value="0.1615" />

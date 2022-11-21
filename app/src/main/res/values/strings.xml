@@ -20,6 +20,8 @@
 
     <string name="startDriving">شروع سفر</string>
     <string name="stopDriving">پایان سفر</string>
+    <string name="waitingDriving">منتظر باشید…</string>
+    <string name="reconnectDriving">در حال اتصال…</string>
 
 
 </resources>

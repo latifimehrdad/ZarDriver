@@ -6,6 +6,8 @@ package com.zarholding.zardriver.background
 
 interface RemoteSignalREmitter {
 
-    fun onReceiveSignalR(message: String)
+    fun onConnectToSignalR()
+    fun onErrorConnectToSignalR()
+    fun onReConnectToSignalR()
 
 }

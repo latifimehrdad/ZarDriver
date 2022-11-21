@@ -20,6 +20,7 @@ import com.zar.core.tools.manager.InternetManager
 import com.zarholding.zardriver.R
 import com.zarholding.zardriver.background.TrackingService
 import com.zarholding.zardriver.databinding.FragmentHomeBinding
+import com.zarholding.zardriver.utility.EnumTripStatus
 import com.zarholding.zardriver.view.activity.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -39,12 +40,12 @@ import javax.inject.Inject
 class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     companion object {
-        var driving = false
+        var chronometerBase = 0L
+        var tripStatus = EnumTripStatus.STOP
     }
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private var counter = 0
 
 
     @Inject
@@ -86,10 +87,10 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- setListener
     private fun setListener() {
         binding.imageViewDriving.setOnClickListener {
-            if (driving)
-                stopDriving()
-            else
-                startDriving()
+            when(tripStatus) {
+                EnumTripStatus.STOP -> startDriving()
+                else -> stopDriving()
+            }
         }
 
         binding.textViewGPS.setOnClickListener {
@@ -147,7 +148,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     private fun stopDriving() {
         if (activity == null)
             return
-        driving = false
+        tripStatus = EnumTripStatus.STOP
         requireActivity().stopService(Intent(requireActivity(), TrackingService::class.java))
         checkServiceIsRun()
     }
@@ -159,8 +160,12 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         CoroutineScope(IO).launch {
             delay(1000)
             withContext(Main) {
-                if (driving) setDriving()
-                else setStopDriving()
+                when(tripStatus) {
+                    EnumTripStatus.STOP -> setStopDriving()
+                    EnumTripStatus.WAITING -> setWaitingDriving()
+                    EnumTripStatus.START -> setDriving()
+                    EnumTripStatus.RECONNECT -> setReconnectDriving()
+                }
             }
         }
     }
@@ -169,18 +174,64 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- setDriving
     private fun setDriving() {
-        counter = 0
         binding.imageViewDriving.setBackgroundResource(R.drawable.back_connect_button)
         binding.viewConnect1.visibility = View.VISIBLE
         binding.viewConnect2.visibility = View.VISIBLE
         binding.textViewDriving.text = getString(R.string.stopDriving)
-/*        binding.chronometer.base = SystemClock.elapsedRealtime()
+        binding.chronometer.stop()
+        binding.chronometer.base = chronometerBase
         binding.chronometer.start()
-        binding.chronometer.setOnChronometerTickListener {
-        }*/
         hideSystemUI()
     }
     //---------------------------------------------------------------------------------------------- setDriving
+
+
+
+    //---------------------------------------------------------------------------------------------- setWaitingDriving
+    private fun setWaitingDriving() {
+        binding.imageViewDriving.setBackgroundResource(R.drawable.back_waiting_button)
+        binding.viewConnect1.visibility = View.VISIBLE
+        binding.viewConnect2.visibility = View.VISIBLE
+        binding.textViewDriving.text = getString(R.string.waitingDriving)
+        binding.chronometer.setOnChronometerTickListener {
+            if (tripStatus != EnumTripStatus.START)
+                checkServiceIsRun()
+        }
+        chronometerBase = SystemClock.elapsedRealtime()
+        binding.chronometer.base = chronometerBase
+        binding.chronometer.start()
+        hideSystemUI()
+    }
+    //---------------------------------------------------------------------------------------------- setWaitingDriving
+
+
+
+
+    //---------------------------------------------------------------------------------------------- setReconnectDriving
+    private fun setReconnectDriving() {
+        requireActivity().stopService(Intent(requireActivity(), TrackingService::class.java))
+        binding.imageViewDriving.setBackgroundResource(R.drawable.back_reconnect_button)
+        binding.viewConnect1.visibility = View.VISIBLE
+        binding.viewConnect2.visibility = View.VISIBLE
+        binding.textViewDriving.text = getString(R.string.reconnectDriving)
+        binding.chronometer.setOnChronometerTickListener {
+            if (tripStatus != EnumTripStatus.START)
+                checkServiceIsRun()
+        }
+        hideSystemUI()
+        startCounterForReconnect()
+    }
+    //---------------------------------------------------------------------------------------------- setReconnectDriving
+
+
+
+
+    private fun startCounterForReconnect() {
+        CoroutineScope(IO).launch {
+            delay(1000)
+            startDriving()
+        }
+    }
 
 
     //---------------------------------------------------------------------------------------------- setStopDriving
@@ -189,7 +240,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         binding.viewConnect1.visibility = View.INVISIBLE
         binding.viewConnect2.visibility = View.INVISIBLE
         binding.textViewDriving.text = getString(R.string.startDriving)
-//        binding.chronometer.stop()
+        binding.chronometer.stop()
         showSystemUI()
     }
     //---------------------------------------------------------------------------------------------- setStopDriving
@@ -286,7 +337,6 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- turnGPSOn
 
 
-
     //---------------------------------------------------------------------------------------------- turnOnInternet
     private fun turnOnInternet() {
         if (checkInternetConnected())
@@ -299,14 +349,9 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- turnOnInternet
 
 
-
-
     //---------------------------------------------------------------------------------------------- onDestroyView
     override fun onDestroyView() {
         super.onDestroyView()
-/*        if (driving)
-            requireActivity().stopService(Intent(requireActivity(), TrackingService::class.java))
-        driving = false*/
         _binding = null
     }
     //---------------------------------------------------------------------------------------------- onDestroyView
