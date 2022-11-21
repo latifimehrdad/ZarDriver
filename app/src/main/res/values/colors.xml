@@ -12,7 +12,7 @@
     <color name="gradiant">#831F35</color>
     <color name="editBorder">#4DD0E1</color>
     <color name="editTextColor">#001233</color>
-    <color name="buttonLoading">#F1BD10</color>
+    <color name="buttonLoading">#FFA200</color>
     <color name="cardStop">#D84E4E</color>
 
     <color name="connect">#00C853</color>
@@ -20,6 +20,7 @@
     <color name="connect_click">#059F45</color>
     <color name="disconnect">#D81A3F</color>
 
+    <color name="gray">#8A99A7</color>
     <color name="gray1">#292929</color>
     <color name="gray2">#0E0E0E</color>
 

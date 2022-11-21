@@ -37,11 +37,13 @@ import com.zarholding.zardriver.viewmodel.TrackingDriverViewModel
  */
 
 @AndroidEntryPoint
-class TrackingService : LifecycleService(), RemoteErrorEmitter {
+class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmitter {
 
     lateinit var job: Job
     private var location: Location? = null
+    lateinit var signalRListener: SignalRListener
 
+    //    private lateinit var locationManager: GeoLocationManager
     private var fusedLocationProvider: FusedLocationProviderClient? = null
 
     @Inject
@@ -55,8 +57,10 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter {
         super.onCreate()
         trackingDriverViewModel = TrackingDriverViewModel(repository)
         MainActivity.remoteErrorEmitter = this
+//        locationManager = GeoLocationManager(applicationContext)
+        signalRListener = SignalRListener.getInstance(this@TrackingService)
         startForeground()
-        createJob()
+//        createJob()
     }
     //---------------------------------------------------------------------------------------------- onCreate
 
@@ -68,6 +72,10 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
+            if (!signalRListener.isConnection)
+                signalRListener.startConnection()
+
+//            locationManager.startLocationTracking(locationCallback)
 
             fusedLocationProvider?.requestLocationUpdates(
                 locationRequest,
@@ -116,8 +124,8 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- locationRequest
     private val locationRequest: LocationRequest = LocationRequest.create().apply {
-        interval = 30
-        fastestInterval = 10
+        interval = 1
+        fastestInterval = 1
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
     //---------------------------------------------------------------------------------------------- locationRequest
@@ -126,11 +134,20 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- locationCallback
     private var locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            if (!HomeFragment.driving)
+            if (!HomeFragment.driving) {
                 fusedLocationProvider?.removeLocationUpdates(this)
+                if (signalRListener.isConnection)
+                    signalRListener.stopConnection()
+//                locationManager.stopLocationTracking()
+            }
             val locationList = locationResult.locations
             if (locationList.isNotEmpty())
                 location = locationList.last()
+            location?.let {
+                if (signalRListener.isConnection)
+                    signalRListener.sendToServer(it.latitude.toFloat(), it.longitude.toFloat())
+                Log.d("meri", "location : ${it.latitude} - ${it.longitude}")
+            }
         }
     }
     //---------------------------------------------------------------------------------------------- locationCallback
@@ -147,17 +164,16 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- counter
     private fun counter(job: Job) {
         CoroutineScope(IO + job).launch {
-            location?.let {
-                Log.d("meri", "location : ${it.latitude} - ${it.longitude}")
-            }
             delay(5000)
             if (HomeFragment.driving) {
                 createJob()
                 withContext(Main) {
-                    requestTrackDriver()
+//                    requestTrackDriver()
                 }
-            } else
+            } else {
+//                locationManager.stopLocationTracking()
                 job.cancel()
+            }
         }
     }
     //---------------------------------------------------------------------------------------------- counter
@@ -170,18 +186,23 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- onError
 
 
-
     //---------------------------------------------------------------------------------------------- requestTrackDriver
     private fun requestTrackDriver() {
         location?.let { loc ->
-            val model = TrackDriverRequestModel(1,loc.latitude.toFloat(), loc.longitude.toFloat())
-            trackingDriverViewModel.requestTrackDriver(model).observe(this@TrackingService){ response ->
-                response?.let {
-                    onError(EnumErrorType.UNKNOWN, it.message)
+            val model = TrackDriverRequestModel(1, loc.latitude.toFloat(), loc.longitude.toFloat())
+            trackingDriverViewModel.requestTrackDriver(model)
+                .observe(this@TrackingService) { response ->
+                    response?.let {
+                        onError(EnumErrorType.UNKNOWN, it.message)
+                    }
                 }
-            }
         }
     }
     //---------------------------------------------------------------------------------------------- requestTrackDriver
+
+
+    override fun onReceiveSignalR(message: String) {
+        TODO("Not yet implemented")
+    }
 
 }

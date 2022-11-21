@@ -1,7 +1,5 @@
 package com.zarholding.zardriver.background;
 
-import android.view.View;
-
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 import com.microsoft.signalr.HubConnectionState;
@@ -14,50 +12,51 @@ public class SignalRListener {
 
     private static SignalRListener instance;
     private final HubConnection hubConnection;
+    private final RemoteSignalREmitter remoteSignalREmitter;
 
 
     //---------------------------------------------------------------------------------------------- SignalRListener
-    public SignalRListener() {
+    public SignalRListener(RemoteSignalREmitter remoteSignalREmitter) {
+        this.remoteSignalREmitter = remoteSignalREmitter;
         hubConnection = HubConnectionBuilder.create("http://10.0.2.2:5000/movehub").build();
-        hubConnection.on("ReceiveNewPosition",(receive -> {
-            //receive
+        hubConnection.on("ReceiveNewPosition", (receive -> {
+            this.remoteSignalREmitter.onReceiveSignalR("receive : " + receive);
         }), Boolean.class);
     }
     //---------------------------------------------------------------------------------------------- SignalRListener
 
 
-
     //---------------------------------------------------------------------------------------------- getInstance
-    public static SignalRListener getInstance() {
+    public static SignalRListener getInstance(RemoteSignalREmitter remoteSignalREmitter) {
         if (instance == null)
-            instance = new SignalRListener();
+            instance = new SignalRListener(remoteSignalREmitter);
         return instance;
     }
     //---------------------------------------------------------------------------------------------- getInstance
 
 
-
     //---------------------------------------------------------------------------------------------- startConnection
-    public boolean startConnection(){
-        if (hubConnection.getConnectionState() == HubConnectionState.DISCONNECTED) {
+    public void startConnection() {
+        if (hubConnection.getConnectionState() == HubConnectionState.DISCONNECTED)
             hubConnection.start();
-            return true;
-        } else
-            return false;
     }
     //---------------------------------------------------------------------------------------------- startConnection
 
 
-
     //---------------------------------------------------------------------------------------------- stopConnection
-    public boolean stopConnection(){
-        if (hubConnection.getConnectionState() == HubConnectionState.CONNECTED) {
+    public void stopConnection() {
+        if (hubConnection.getConnectionState() == HubConnectionState.CONNECTED)
             hubConnection.stop();
-            return true;
-        } else
-            return false;
     }
     //---------------------------------------------------------------------------------------------- stopConnection
+
+
+
+    //---------------------------------------------------------------------------------------------- isConnection
+    public boolean isConnection() {
+        return hubConnection.getConnectionState() == HubConnectionState.CONNECTED;
+    }
+    //---------------------------------------------------------------------------------------------- isConnection
 
 
 

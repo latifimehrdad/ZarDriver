@@ -23,9 +23,11 @@ import com.zarholding.zardriver.databinding.FragmentHomeBinding
 import com.zarholding.zardriver.view.activity.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -67,7 +69,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         binding.lifecycleOwner = viewLifecycleOwner
         setListener()
         setStopDriving()
-//        checkServiceIsRun()
+        checkServiceIsRun()
         checkInternetConnected()
         checkLocationEnable()
     }
@@ -154,10 +156,12 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- checkServiceIsRun
     private fun checkServiceIsRun() {
-        CoroutineScope(Main).launch {
+        CoroutineScope(IO).launch {
             delay(1000)
-            if (driving) setDriving()
-            else setStopDriving()
+            withContext(Main) {
+                if (driving) setDriving()
+                else setStopDriving()
+            }
         }
     }
     //---------------------------------------------------------------------------------------------- checkServiceIsRun
@@ -170,10 +174,10 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         binding.viewConnect1.visibility = View.VISIBLE
         binding.viewConnect2.visibility = View.VISIBLE
         binding.textViewDriving.text = getString(R.string.stopDriving)
-        binding.chronometer.base = SystemClock.elapsedRealtime()
+/*        binding.chronometer.base = SystemClock.elapsedRealtime()
         binding.chronometer.start()
         binding.chronometer.setOnChronometerTickListener {
-        }
+        }*/
         hideSystemUI()
     }
     //---------------------------------------------------------------------------------------------- setDriving
@@ -185,7 +189,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         binding.viewConnect1.visibility = View.INVISIBLE
         binding.viewConnect2.visibility = View.INVISIBLE
         binding.textViewDriving.text = getString(R.string.startDriving)
-        binding.chronometer.stop()
+//        binding.chronometer.stop()
         showSystemUI()
     }
     //---------------------------------------------------------------------------------------------- setStopDriving
@@ -300,9 +304,9 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- onDestroyView
     override fun onDestroyView() {
         super.onDestroyView()
-        if (driving)
+/*        if (driving)
             requireActivity().stopService(Intent(requireActivity(), TrackingService::class.java))
-        driving = false
+        driving = false*/
         _binding = null
     }
     //---------------------------------------------------------------------------------------------- onDestroyView
