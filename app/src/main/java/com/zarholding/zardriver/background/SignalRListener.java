@@ -16,14 +16,12 @@ public class SignalRListener {
     private final RemoteSignalREmitter remoteSignalREmitter;
     private Thread thread;
 
-//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiVXNlck5hbWUiOiJzdXBlcmFkbWluIiwiUGVyc29ubmVsTnVtYmVyIjoiU3VwZXJBZG1pbiIsIkZ1bGxOYW1lIjoiU3VwZXIgQWRtaW4iLCJSb2xlcyI6IlJlZ2lzdGVyZWRVc2VyIiwibmJmIjoxNjY5MDI0OTM1LCJleHAiOjE2NjkxMTEzMzUsImlhdCI6MTY2OTAyNDkzNX0.Z2Msyx3mpgujVodgcN8-iY-ai3mEq0HLniStUYDHOEU
     //---------------------------------------------------------------------------------------------- SignalRListener
     public SignalRListener(RemoteSignalREmitter remoteSignalREmitter, String token) {
         this.remoteSignalREmitter = remoteSignalREmitter;
-        hubConnection = HubConnectionBuilder.create("http://192.168.50.113:1364/realtimenotification?access_token=" + token).build();
-/*        hubConnection.on("ReceiveNewPosition", (receive) -> {
-            this.remoteSignalREmitter.onReceiveSignalR("receive : " + receive);
-        }, Boolean.class);*/
+        hubConnection = HubConnectionBuilder
+                .create("http://192.168.50.113:1364/realtimenotification?access_token=" + token)
+                .build();
     }
     //---------------------------------------------------------------------------------------------- SignalRListener
 
@@ -53,11 +51,11 @@ public class SignalRListener {
 
                     hubConnection.onClosed(exception -> {
                         remoteSignalREmitter.onReConnectToSignalR();
-                        thread.interrupt();
+                        interruptThread();
                     });
                 } catch (Exception ignored) {
                     remoteSignalREmitter.onReConnectToSignalR();
-                    thread.interrupt();
+                    interruptThread();
                 }
             }
         };
@@ -70,6 +68,7 @@ public class SignalRListener {
     public void stopConnection() {
         if (hubConnection.getConnectionState() == HubConnectionState.CONNECTED)
             hubConnection.stop();
+        interruptThread();
     }
     //---------------------------------------------------------------------------------------------- stopConnection
 
@@ -88,5 +87,16 @@ public class SignalRListener {
     }
     //---------------------------------------------------------------------------------------------- sendToServer
 
+
+    //---------------------------------------------------------------------------------------------- interruptThread
+    public void interruptThread() {
+        if (thread != null)
+            thread.interrupt();
+    }
+    //---------------------------------------------------------------------------------------------- interruptThread
+
+    /*        hubConnection.on("ReceiveNewPosition", (receive) -> {
+            this.remoteSignalREmitter.onReceiveSignalR("receive : " + receive);
+        }, Boolean.class);*/
 
 }

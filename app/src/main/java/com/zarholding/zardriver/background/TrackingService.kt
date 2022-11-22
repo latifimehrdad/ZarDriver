@@ -6,12 +6,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.content.ContextCompat
@@ -23,15 +21,12 @@ import com.zarholding.zardriver.utility.CompanionValues
 import com.zarholding.zardriver.utility.EnumTripStatus
 import com.zarholding.zardriver.view.activity.MainActivity
 import com.zarholding.zardriver.view.fragment.HomeFragment
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 /**
  * Created by m-latifi on 11/9/2022.
  */
 
-@AndroidEntryPoint
 class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmitter {
 
     private var location: Location? = null
@@ -39,8 +34,8 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     private var fusedLocationProvider: FusedLocationProviderClient? = null
 
-    @Inject
-    lateinit var sharedPreferences: SharedPreferences
+    private var serviceId: String? = null
+    private var token: String? = null
 
 
     //---------------------------------------------------------------------------------------------- onCreate
@@ -48,9 +43,6 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
         super.onCreate()
         HomeFragment.tripStatus = EnumTripStatus.WAITING
         MainActivity.remoteErrorEmitter = this
-        var token = sharedPreferences.getString(CompanionValues.sharedPreferencesToken, null)
-        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiVXNlck5hbWUiOiJzdXBlcmFkbWluIiwiUGVyc29ubmVsTnVtYmVyIjoiU3VwZXJBZG1pbiIsIkZ1bGxOYW1lIjoiU3VwZXIgQWRtaW4iLCJSb2xlcyI6IlJlZ2lzdGVyZWRVc2VyIiwibmJmIjoxNjY5MDI0OTM1LCJleHAiOjE2NjkxMTEzMzUsImlhdCI6MTY2OTAyNDkzNX0.Z2Msyx3mpgujVodgcN8-iY-ai3mEq0HLniStUYDHOEU"
-        signalRListener = SignalRListener.getInstance(this@TrackingService, token)
         startForeground()
     }
     //---------------------------------------------------------------------------------------------- onCreate
@@ -58,7 +50,9 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- onStartCommand
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("meri", "onStartCommand")
+        token = intent?.extras?.getString(CompanionValues.spToken, null)
+        serviceId = intent?.extras?.getString(CompanionValues.spServiceId, null)
+        signalRListener = SignalRListener.getInstance(this@TrackingService, token)
         startSignalR()
         return super.onStartCommand(intent, flags, startId)
     }
@@ -72,14 +66,13 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
         val notification = notificationBuilder.setOngoing(true)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setPriority(PRIORITY_HIGH)
-            .setContentTitle("Driver is running ....")
+            .setContentTitle(applicationContext.resources.getString(R.string.appIsRunning))
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setCategory(Notification.CATEGORY_SERVICE)
             .build()
         startForeground(101, notification)
     }
     //---------------------------------------------------------------------------------------------- startForeground
-
 
 
     //---------------------------------------------------------------------------------------------- startSignalR
@@ -148,13 +141,10 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
             location?.let {
                 if (signalRListener.isConnection)
                     signalRListener.sendToServer(
-                        "service10",
+                        serviceId,
                         it.latitude.toString(),
                         it.longitude.toString()
                     )
-                else
-                    Log.d("meri", "signalRListener is disconnect")
-                Log.d("meri", "location : ${it.latitude} - ${it.longitude}")
             }
         }
     }
@@ -163,25 +153,20 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- onConnectToSignalR
     override fun onConnectToSignalR() {
-        Log.d("meri", "onConnectToSignalR")
         startLocationProvider()
     }
     //---------------------------------------------------------------------------------------------- onConnectToSignalR
 
 
-
     //---------------------------------------------------------------------------------------------- onErrorConnectToSignalR
     override fun onErrorConnectToSignalR() {
-        Log.d("meri", "onErrorConnectToSignalR")
         HomeFragment.tripStatus = EnumTripStatus.STOP
     }
     //---------------------------------------------------------------------------------------------- onErrorConnectToSignalR
 
 
-
     //---------------------------------------------------------------------------------------------- onReConnectToSignalR
     override fun onReConnectToSignalR() {
-        Log.d("meri", "onReConnectToSignalR")
         HomeFragment.tripStatus = EnumTripStatus.RECONNECT
     }
     //---------------------------------------------------------------------------------------------- onReConnectToSignalR

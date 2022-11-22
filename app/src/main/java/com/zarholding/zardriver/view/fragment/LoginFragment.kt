@@ -2,16 +2,15 @@ package com.zarholding.zardriver.view.fragment
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.zar.core.enums.EnumErrorType
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
+import com.zar.core.tools.extensions.isNationalCode
 import com.zarholding.zardriver.R
 import com.zarholding.zardriver.databinding.FragmentLoginBinding
 import com.zarholding.zardriver.model.request.LoginRequestModel
@@ -92,7 +91,7 @@ class LoginFragment : Fragment(), RemoteErrorEmitter {
         if (loginViewModel.loadingLiveDate.value == true)
             return
 
-        if (loginViewModel.userName.isNullOrEmpty()) {
+        if (!loginViewModel.userName.isNationalCode()) {
             binding.textInputLayoutUserName.error = getString(R.string.userNameValidationFailed)
             return
         }
@@ -121,7 +120,7 @@ class LoginFragment : Fragment(), RemoteErrorEmitter {
                 } else {
                     sharedPreferences
                         .edit()
-                        .putString(CompanionValues.sharedPreferencesToken, it.data)
+                        .putString(CompanionValues.spToken, it.data)
                         .apply()
                     stopLoading()
                     if (activity != null)

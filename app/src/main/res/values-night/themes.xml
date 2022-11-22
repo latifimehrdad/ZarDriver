@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.ZarDriver" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.ZarDriver" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/pageBack</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -14,7 +14,7 @@
         <!-- Customize your theme here. -->
 
         <item name="android:navigationBarColor">@color/pageBack</item>
-        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">true</item>
 
     </style>
 

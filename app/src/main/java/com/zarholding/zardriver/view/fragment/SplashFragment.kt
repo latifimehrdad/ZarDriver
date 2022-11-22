@@ -51,7 +51,6 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        Log.d("meri", "onViewCreated")
         checkUserIsLogged()
     }
     //---------------------------------------------------------------------------------------------- onViewCreated
@@ -66,7 +65,7 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- checkUserIsLogged
     private fun checkUserIsLogged() {
-        val token = sharedPreferences.getString(CompanionValues.sharedPreferencesToken, null)
+        val token = sharedPreferences.getString(CompanionValues.spToken, null)
         token?.let {
             gotoFragmentHome()
         } ?: gotoFragmentLogin()

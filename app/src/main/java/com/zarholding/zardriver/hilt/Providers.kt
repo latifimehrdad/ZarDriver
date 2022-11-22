@@ -1,16 +1,13 @@
 package com.zarholding.zardriver.hilt
 
-import com.google.gson.Gson
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
-import com.zarholding.zardriver.api.ApiInterface8081
+import com.zarholding.zardriver.api.ApiInterface9090
 import com.zarholding.zardriver.view.activity.MainActivity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -28,7 +25,7 @@ class Providers {
     @Singleton
     @Named("Normal")
     fun provideBaseUrl(): String {
-        return "http://192.168.50.153:8081"
+        return "http://192.168.50.153:9090"
     }
     //---------------------------------------------------------------------------------------------- provideBaseUrl
 
@@ -46,8 +43,8 @@ class Providers {
     //---------------------------------------------------------------------------------------------- provideApiService
     @Provides
     @Singleton
-    fun provideApiService(@Named("Normal") retrofit: Retrofit): ApiInterface8081 {
-        return retrofit.create(ApiInterface8081::class.java)
+    fun provideApiService(@Named("Normal") retrofit: Retrofit): ApiInterface9090 {
+        return retrofit.create(ApiInterface9090::class.java)
     }
     //---------------------------------------------------------------------------------------------- provideApiService
 
