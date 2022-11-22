@@ -4,7 +4,6 @@ import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -24,22 +23,22 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), RemoteErrorEmitter {
 
+    private val requestLocation = 99
+    private val requestBackgroundLocation = 66
+
 
     //---------------------------------------------------------------------------------------------- companion object
     companion object {
         lateinit var remoteErrorEmitter: RemoteErrorEmitter
-        private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
-        private const val MY_PERMISSIONS_REQUEST_BACKGROUND_LOCATION = 66
     }
     //---------------------------------------------------------------------------------------------- companion object
+
 
 
     //---------------------------------------------------------------------------------------------- onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
         checkLocationPermission()
     }
     //---------------------------------------------------------------------------------------------- onCreate
@@ -95,13 +94,13 @@ class MainActivity : AppCompatActivity(), RemoteErrorEmitter {
                 arrayOf(
                     Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 ),
-                MY_PERMISSIONS_REQUEST_BACKGROUND_LOCATION
+                requestBackgroundLocation
             )
         } else {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                MY_PERMISSIONS_REQUEST_LOCATION
+                requestLocation
             )
         }
     }

@@ -6,8 +6,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.snackbar.Snackbar
 import com.zar.core.enums.EnumErrorType
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.R
@@ -59,7 +61,9 @@ class LoginFragment : Fragment(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- onError
     override fun onError(errorType: EnumErrorType, message: String) {
-        Log.d("meri", message)
+        val snack = Snackbar.make(binding.scrollViewLogin, message, 10*1000)
+        snack.setAction(getString(R.string.dismiss)) { snack.dismiss() }
+        snack.show()
         stopLoading()
     }
     //---------------------------------------------------------------------------------------------- onError

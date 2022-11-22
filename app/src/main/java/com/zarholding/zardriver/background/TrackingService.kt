@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
@@ -18,15 +19,19 @@ import androidx.lifecycle.*
 import com.google.android.gms.location.*
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.R
+import com.zarholding.zardriver.utility.CompanionValues
 import com.zarholding.zardriver.utility.EnumTripStatus
 import com.zarholding.zardriver.view.activity.MainActivity
 import com.zarholding.zardriver.view.fragment.HomeFragment
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 /**
  * Created by m-latifi on 11/9/2022.
  */
 
+@AndroidEntryPoint
 class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmitter {
 
     private var location: Location? = null
@@ -34,12 +39,18 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     private var fusedLocationProvider: FusedLocationProviderClient? = null
 
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
 
     //---------------------------------------------------------------------------------------------- onCreate
     override fun onCreate() {
         super.onCreate()
+        HomeFragment.tripStatus = EnumTripStatus.WAITING
         MainActivity.remoteErrorEmitter = this
-        signalRListener = SignalRListener.getInstance(this@TrackingService)
+        var token = sharedPreferences.getString(CompanionValues.sharedPreferencesToken, null)
+        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiVXNlck5hbWUiOiJzdXBlcmFkbWluIiwiUGVyc29ubmVsTnVtYmVyIjoiU3VwZXJBZG1pbiIsIkZ1bGxOYW1lIjoiU3VwZXIgQWRtaW4iLCJSb2xlcyI6IlJlZ2lzdGVyZWRVc2VyIiwibmJmIjoxNjY5MDI0OTM1LCJleHAiOjE2NjkxMTEzMzUsImlhdCI6MTY2OTAyNDkzNX0.Z2Msyx3mpgujVodgcN8-iY-ai3mEq0HLniStUYDHOEU"
+        signalRListener = SignalRListener.getInstance(this@TrackingService, token)
         startForeground()
     }
     //---------------------------------------------------------------------------------------------- onCreate
@@ -47,7 +58,7 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- onStartCommand
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        HomeFragment.tripStatus = EnumTripStatus.WAITING
+        Log.d("meri", "onStartCommand")
         startSignalR()
         return super.onStartCommand(intent, flags, startId)
     }
@@ -152,6 +163,7 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- onConnectToSignalR
     override fun onConnectToSignalR() {
+        Log.d("meri", "onConnectToSignalR")
         startLocationProvider()
     }
     //---------------------------------------------------------------------------------------------- onConnectToSignalR
@@ -160,6 +172,7 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- onErrorConnectToSignalR
     override fun onErrorConnectToSignalR() {
+        Log.d("meri", "onErrorConnectToSignalR")
         HomeFragment.tripStatus = EnumTripStatus.STOP
     }
     //---------------------------------------------------------------------------------------------- onErrorConnectToSignalR
@@ -168,7 +181,8 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- onReConnectToSignalR
     override fun onReConnectToSignalR() {
-        HomeFragment.tripStatus = EnumTripStatus.WAITING
+        Log.d("meri", "onReConnectToSignalR")
+        HomeFragment.tripStatus = EnumTripStatus.RECONNECT
     }
     //---------------------------------------------------------------------------------------------- onReConnectToSignalR
 

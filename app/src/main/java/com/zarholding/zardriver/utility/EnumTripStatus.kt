@@ -8,5 +8,6 @@ enum class EnumTripStatus {
     STOP,
     WAITING,
     START,
-    RECONNECT
+    RECONNECT,
+    CONNECTING
 }

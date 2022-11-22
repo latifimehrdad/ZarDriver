@@ -9,6 +9,7 @@
     </data>
 
     <ScrollView
+        android:id="@+id/scrollViewLogin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -65,6 +66,7 @@
                 app:boxCornerRadiusTopEnd="@dimen/_5sdp"
                 app:boxCornerRadiusTopStart="@dimen/_5sdp"
                 app:passwordToggleEnabled="true"
+                android:layoutDirection="rtl"
                 app:boxStrokeColor="@color/pageBack"
                 app:hintTextColor="@color/pageBack"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
@@ -95,7 +97,8 @@
                 android:textSize="@dimen/_10sdp"
                 android:layout_margin="@dimen/_2sdp"
                 android:text="@string/forgetPassword"
-                android:fontFamily="@font/vazir_bold"/>
+                android:fontFamily="@font/vazir_bold"
+                android:visibility="gone"/>
 
             <ImageView
                 android:layout_width="@dimen/_65sdp"
@@ -104,7 +107,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/textInputLayoutUserName"
                 android:layout_marginBottom="@dimen/_20sdp"
-                android:contentDescription="@string/logoContentDescription" />
+                android:contentDescription="@string/logoContentDescription"
+                android:src="@drawable/solid_white"
+                app:tint="@color/buttonLoading" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonLogin"

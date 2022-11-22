@@ -1,8 +1,5 @@
 package com.zarholding.zardriver.background;
 
-import android.os.Handler;
-import android.util.Log;
-
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 import com.microsoft.signalr.HubConnectionState;
@@ -15,14 +12,15 @@ import com.microsoft.signalr.HubConnectionState;
 public class SignalRListener {
 
     private static SignalRListener instance;
-    private HubConnection hubConnection;
+    private final HubConnection hubConnection;
     private final RemoteSignalREmitter remoteSignalREmitter;
+    private Thread thread;
 
-
+//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiVXNlck5hbWUiOiJzdXBlcmFkbWluIiwiUGVyc29ubmVsTnVtYmVyIjoiU3VwZXJBZG1pbiIsIkZ1bGxOYW1lIjoiU3VwZXIgQWRtaW4iLCJSb2xlcyI6IlJlZ2lzdGVyZWRVc2VyIiwibmJmIjoxNjY5MDI0OTM1LCJleHAiOjE2NjkxMTEzMzUsImlhdCI6MTY2OTAyNDkzNX0.Z2Msyx3mpgujVodgcN8-iY-ai3mEq0HLniStUYDHOEU
     //---------------------------------------------------------------------------------------------- SignalRListener
-    public SignalRListener(RemoteSignalREmitter remoteSignalREmitter) {
+    public SignalRListener(RemoteSignalREmitter remoteSignalREmitter, String token) {
         this.remoteSignalREmitter = remoteSignalREmitter;
-        hubConnection = HubConnectionBuilder.create("http://192.168.50.113:1364/realtimenotification?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwiVXNlck5hbWUiOiJzdXBlcmFkbWluIiwiUGVyc29ubmVsTnVtYmVyIjoiU3VwZXJBZG1pbiIsIkZ1bGxOYW1lIjoiU3VwZXIgQWRtaW4iLCJSb2xlcyI6IlJlZ2lzdGVyZWRVc2VyIiwibmJmIjoxNjY5MDI0OTM1LCJleHAiOjE2NjkxMTEzMzUsImlhdCI6MTY2OTAyNDkzNX0.Z2Msyx3mpgujVodgcN8-iY-ai3mEq0HLniStUYDHOEU").build();
+        hubConnection = HubConnectionBuilder.create("http://192.168.50.113:1364/realtimenotification?access_token=" + token).build();
 /*        hubConnection.on("ReceiveNewPosition", (receive) -> {
             this.remoteSignalREmitter.onReceiveSignalR("receive : " + receive);
         }, Boolean.class);*/
@@ -31,9 +29,9 @@ public class SignalRListener {
 
 
     //---------------------------------------------------------------------------------------------- getInstance
-    public static SignalRListener getInstance(RemoteSignalREmitter remoteSignalREmitter) {
+    public static SignalRListener getInstance(RemoteSignalREmitter remote, String token) {
         if (instance == null)
-            instance = new SignalRListener(remoteSignalREmitter);
+            instance = new SignalRListener(remote, token);
         return instance;
     }
     //---------------------------------------------------------------------------------------------- getInstance
@@ -41,23 +39,31 @@ public class SignalRListener {
 
     //---------------------------------------------------------------------------------------------- startConnection
     public void startConnection() {
-        Handler handler = new Handler();
-        handler.postDelayed(() ->{
-            if (hubConnection.getConnectionState() == HubConnectionState.DISCONNECTED)
-                hubConnection
-                        .start()
-                        .doOnError(throwable -> remoteSignalREmitter.onErrorConnectToSignalR())
-                        .doOnComplete(remoteSignalREmitter::onConnectToSignalR)
-                        .blockingAwait();
-        }, 2000);
-        hubConnection.onClosed(exception -> {
-            Log.i("meri", "onClosed");
-            remoteSignalREmitter.onReConnectToSignalR();
-        });
+        thread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    if (hubConnection.getConnectionState() == HubConnectionState.DISCONNECTED)
+                        hubConnection
+                                .start()
+                                .doOnError(throwable -> remoteSignalREmitter.onErrorConnectToSignalR())
+                                .doOnComplete(remoteSignalREmitter::onConnectToSignalR)
+                                .blockingAwait();
+
+                    hubConnection.onClosed(exception -> {
+                        remoteSignalREmitter.onReConnectToSignalR();
+                        thread.interrupt();
+                    });
+                } catch (Exception ignored) {
+                    remoteSignalREmitter.onReConnectToSignalR();
+                    thread.interrupt();
+                }
+            }
+        };
+        thread.start();
     }
     //---------------------------------------------------------------------------------------------- startConnection
-
-
 
 
     //---------------------------------------------------------------------------------------------- stopConnection
@@ -68,13 +74,11 @@ public class SignalRListener {
     //---------------------------------------------------------------------------------------------- stopConnection
 
 
-
     //---------------------------------------------------------------------------------------------- isConnection
     public boolean isConnection() {
         return hubConnection.getConnectionState() == HubConnectionState.CONNECTED;
     }
     //---------------------------------------------------------------------------------------------- isConnection
-
 
 
     //---------------------------------------------------------------------------------------------- sendToServer

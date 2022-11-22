@@ -9,6 +9,7 @@
     <string name="loginToAccount">ورود به حساب کاربری</string>
     <string name="bePatient">شکیبا باشید …</string>
 
+    <string name="dismiss">بستن</string>
     <string name="userNameValidationFailed">نام کاربری را وارد نمایید</string>
     <string name="passwordValidationFailed">رمز ورود را وارد نمایید</string>
     <string name="location">موقعیت مکانی</string>
@@ -17,6 +18,7 @@
     <string name="home">home</string>
     <string name="p_internet">اینترنت</string>
     <string name="errorLocationIsOff">موقیعت مکانی دستگاه خود را روشن کنید</string>
+    <string name="errorInternetIsOff">اینترنت دستگاه خود را چک کنید</string>
 
     <string name="startDriving">شروع سفر</string>
     <string name="stopDriving">پایان سفر</string>
