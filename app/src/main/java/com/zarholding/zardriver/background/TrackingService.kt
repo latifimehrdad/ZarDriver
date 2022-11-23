@@ -159,17 +159,17 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- sendToServer
     private fun sendToServer(currentLocation: Location) {
-        var stationId = -1
-        tripModel?.let {
-            stationId = LocationTool().checkLocationNearbyStation(it.stations, currentLocation)
-        }
+        var stationId = tripModel?.let {
+            LocationTool().checkLocationNearbyStation(it.stations, currentLocation)
+        } ?: run { -1 }
         if (stationId == -1)
             sendPointToServer(currentLocation)
-        else
+        else {
+            stationId = tripModel!!.stations!![stationId].id
             sendNotificationToServer(stationId)
+        }
     }
     //---------------------------------------------------------------------------------------------- sendToServer
-
 
 
     //---------------------------------------------------------------------------------------------- sendPointToServer
@@ -184,14 +184,11 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
     //---------------------------------------------------------------------------------------------- sendPointToServer
 
 
-
     //---------------------------------------------------------------------------------------------- sendNotificationToServer
-    private fun sendNotificationToServer(stationId : Int) {
+    private fun sendNotificationToServer(stationId: Int) {
         signalRListener.NotificationToServer(tripModel?.id, stationId)
     }
     //---------------------------------------------------------------------------------------------- sendNotificationToServer
-
-
 
 
     //---------------------------------------------------------------------------------------------- onConnectToSignalR

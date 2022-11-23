@@ -4,7 +4,6 @@
         <shape android:shape="oval">
             <gradient
                 android:startColor="@color/connect_click"
-                android:centerColor="@color/gradiant1_1"
                 android:endColor="@color/gradiant1"
                 android:centerX="90%"
                 android:angle="45"
@@ -17,8 +16,7 @@
         <shape android:shape="oval">
             <gradient
                 android:startColor="@color/connect"
-                android:centerColor="@color/connect_center"
-                android:endColor="@color/gradiant0"
+                android:endColor="@color/gradiant1"
                 android:centerX="90%"
                 android:angle="45"
                 />

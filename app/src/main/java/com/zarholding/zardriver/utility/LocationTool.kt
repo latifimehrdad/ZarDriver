@@ -2,6 +2,7 @@ package com.zarholding.zardriver.utility
 
 import android.location.Location
 import android.location.LocationManager
+import android.util.Log
 import com.zarholding.zardriver.model.response.TripStationModel
 
 /**
@@ -10,6 +11,7 @@ import com.zarholding.zardriver.model.response.TripStationModel
 
 class LocationTool {
 
+    private val tolerance = 200.0
 
     //---------------------------------------------------------------------------------------------- checkLocationNearbyStation
     fun checkLocationNearbyStation(
@@ -24,10 +26,12 @@ class LocationTool {
                     station.latitude = it[i].stationLat.toDouble()
                     station.longitude = it[i].sationLong.toDouble()
                     val distance = measureDistance(currentLocation, station)
-                    if (distance < 200.0) {
+                    if (distance < tolerance) {
+                        Log.i("meri", "distance = $distance name = ${it[i].stationName}")
                         it[i].isNotification = true
                         if (i + 1 < it.size)
                             stationId = i + 1
+                        break
                     }
                 }
         }
