@@ -19,8 +19,9 @@ public class SignalRListener {
     //---------------------------------------------------------------------------------------------- SignalRListener
     public SignalRListener(RemoteSignalREmitter remoteSignalREmitter, String token) {
         this.remoteSignalREmitter = remoteSignalREmitter;
+        String url = "http://192.168.50.113:1364/realtimenotification?access_token=" + token;
         hubConnection = HubConnectionBuilder
-                .create("http://192.168.50.113:1364/realtimenotification?access_token=" + token)
+                .create(url)
                 .build();
     }
     //---------------------------------------------------------------------------------------------- SignalRListener
@@ -81,11 +82,23 @@ public class SignalRListener {
 
 
     //---------------------------------------------------------------------------------------------- sendToServer
-    public void sendToServer(String serviceId, String lat, String lon) {
+    public void sendToServer(Integer tripId,Integer driverId, String lat, String lon) {
+        String arg = "trip" + tripId;
         if (hubConnection.getConnectionState() == HubConnectionState.CONNECTED)
-            hubConnection.send("TrackDriver", serviceId, lat, lon);
+            hubConnection.send("TrackDriver", arg, driverId, lat, lon);
     }
     //---------------------------------------------------------------------------------------------- sendToServer
+
+
+
+    //---------------------------------------------------------------------------------------------- NotificationToServer
+    public void NotificationToServer(Integer tripId, Integer stationId) {
+        String arg = "trip" + tripId + "station" + stationId;
+        if (hubConnection.getConnectionState() == HubConnectionState.CONNECTED)
+            hubConnection.send("InformNextStation", arg);
+    }
+    //---------------------------------------------------------------------------------------------- NotificationToServer
+
 
 
     //---------------------------------------------------------------------------------------------- interruptThread

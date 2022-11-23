@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +23,7 @@ import com.zarholding.zardriver.R
 import com.zarholding.zardriver.background.TrackingService
 import com.zarholding.zardriver.databinding.FragmentHomeBinding
 import com.zarholding.zardriver.model.response.TripModel
+import com.zarholding.zardriver.model.response.driver.DriverModel
 import com.zarholding.zardriver.utility.CompanionValues
 import com.zarholding.zardriver.utility.EnumTripStatus
 import com.zarholding.zardriver.view.activity.MainActivity
@@ -49,17 +49,18 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private var job: Job? = null
-    private var timerCounting = false
 
 
     @Inject
     lateinit var internetConnection: InternetManager
 
-    lateinit var tripModel : TripModel
-
     private val tripViewModel: TripDriverViewModel by viewModels()
     private val tokenViewModel : TokenViewModel by viewModels()
+
+    lateinit var tripModel : TripModel
+    private var job: Job? = null
+    private var timerCounting = false
+    private var driverModel : DriverModel? = null
 
 
     //---------------------------------------------------------------------------------------------- onCreateView
@@ -78,13 +79,22 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         super.onViewCreated(view, savedInstanceState)
         MainActivity.remoteErrorEmitter = this
         binding.lifecycleOwner = viewLifecycleOwner
+        driverModel = arguments?.getParcelable(CompanionValues.driverModel)
         setListener()
         setStopDriving()
         checkServiceIsRun()
         checkInternetConnected()
         checkLocationEnable()
+/*        val start = Location(LocationManager.GPS_PROVIDER)
+        start.latitude = 35.840267
+        start.longitude = 51.017524
+        val end = Location(LocationManager.GPS_PROVIDER)
+        end.latitude = 35.840404
+        end.longitude = 51.015378
+        Log.i("meri", "measure distance = ${measureDistance(start, end)}")*/
     }
     //---------------------------------------------------------------------------------------------- onViewCreated
+
 
 
     //---------------------------------------------------------------------------------------------- onError
@@ -145,9 +155,9 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- beforeStartDriving
 
 
+
     //---------------------------------------------------------------------------------------------- requestStartTripDriver
     private fun requestStartTripDriver() {
-
         if (tripStatus == EnumTripStatus.STOP) {
             tripStatus = EnumTripStatus.WAITING
             setWaitingDriving()
@@ -200,11 +210,10 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- startServiceBackground
     private fun startServiceBackground() {
-        val serviceId = "service${tripModel.Id}"
-        Log.i("meri", serviceId)
         val intent = Intent(requireActivity(), TrackingService::class.java)
         intent.putExtra(CompanionValues.spToken, tokenViewModel.getToken())
-        intent.putExtra(CompanionValues.spServiceId, serviceId)
+        intent.putExtra(CompanionValues.tripModel, tripModel)
+        intent.putExtra(CompanionValues.driverId, driverModel?.id)
         requireActivity().startForegroundService(intent)
     }
     //---------------------------------------------------------------------------------------------- startServiceBackground

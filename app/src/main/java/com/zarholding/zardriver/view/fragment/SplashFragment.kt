@@ -2,18 +2,21 @@ package com.zarholding.zardriver.view.fragment
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.zar.core.enums.EnumErrorType
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.R
 import com.zarholding.zardriver.databinding.FragmentSplashBinding
+import com.zarholding.zardriver.model.response.driver.DriverModel
 import com.zarholding.zardriver.utility.CompanionValues
 import com.zarholding.zardriver.view.activity.MainActivity
+import com.zarholding.zardriver.viewmodel.DriverViewModel
+import com.zarholding.zardriver.viewmodel.TokenViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
@@ -29,10 +32,14 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
     private var _binding: FragmentSplashBinding? = null
     private val binding get() = _binding!!
 
-    lateinit var job: Job
-
     @Inject
     lateinit var sharedPreferences: SharedPreferences
+
+    private val tokenViewModel: TokenViewModel by viewModels()
+    private val driverViewModel: DriverViewModel by viewModels()
+
+    private var job: Job? = null
+    lateinit var driverModel: DriverModel
 
 
     //---------------------------------------------------------------------------------------------- onCreateView
@@ -67,10 +74,35 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
     private fun checkUserIsLogged() {
         val token = sharedPreferences.getString(CompanionValues.spToken, null)
         token?.let {
-            gotoFragmentHome()
+            requestGetDriverInfo()
         } ?: gotoFragmentLogin()
     }
     //---------------------------------------------------------------------------------------------- checkUserIsLogged
+
+
+    //---------------------------------------------------------------------------------------------- requestGetDriverInfo
+    private fun requestGetDriverInfo() {
+        driverViewModel.requestGetDriverInfo(tokenViewModel.getBearerToken())
+            .observe(viewLifecycleOwner) { response ->
+                response?.let {
+                    it.data?.let { info ->
+                        driverModel = info
+                        gotoFragmentHome()
+                    } ?: run {
+                        onError(
+                            EnumErrorType.UNKNOWN,
+                            requireContext().getString(R.string.driverInfoIsEmpty)
+                        )
+                    }
+                } ?: run {
+                    onError(
+                        EnumErrorType.UNKNOWN,
+                        requireContext().getString(R.string.driverInfoIsEmpty)
+                    )
+                }
+            }
+    }
+    //---------------------------------------------------------------------------------------------- requestGetDriverInfo
 
 
     //---------------------------------------------------------------------------------------------- gotoFragmentLogin
@@ -90,7 +122,9 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
         job = CoroutineScope(Dispatchers.IO).launch {
             delay(2000)
             withContext(Main) {
-                findNavController().navigate(R.id.action_splashFragment_to_HomeFragment)
+                val bundle = Bundle()
+                bundle.putParcelable(CompanionValues.driverModel, driverModel)
+                findNavController().navigate(R.id.action_splashFragment_to_HomeFragment, bundle)
             }
         }
     }
@@ -100,8 +134,7 @@ class SplashFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- onDestroyView
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("meri", "onDestroyView")
-        job.cancel()
+        job?.cancel()
         _binding = null
     }
     //---------------------------------------------------------------------------------------------- onDestroyView

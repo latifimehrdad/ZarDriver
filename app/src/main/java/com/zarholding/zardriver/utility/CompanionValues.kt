@@ -8,6 +8,8 @@ class CompanionValues {
 
     companion object {
         const val spToken = "token"
-        const val spServiceId = "serviceId"
+        const val tripModel = "tripModel"
+        const val driverModel = "driverModel"
+        const val driverId = "driverId"
     }
 }

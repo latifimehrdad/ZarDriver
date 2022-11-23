@@ -15,7 +15,7 @@ class TripDriverRepository @Inject constructor(private val apiInterface9090: Api
     lateinit var emitter: RemoteErrorEmitter
 
     //---------------------------------------------------------------------------------------------- requestStartTripDriver
-    fun requestStartTripDriver(token: String) = apiCall(emitter)
-    { apiInterface9090.requestStartTripDriver(token) }
+    fun requestStartTripDriver(token: String) =
+        apiCall(emitter) { apiInterface9090.requestStartTripDriver(token) }
     //---------------------------------------------------------------------------------------------- requestStartTripDriver
 }

@@ -20,6 +20,7 @@
     <string name="p_internet">اینترنت</string>
     <string name="errorLocationIsOff">موقیعت مکانی دستگاه خود را روشن کنید</string>
     <string name="errorInternetIsOff">اینترنت دستگاه خود را چک کنید</string>
+    <string name="driverInfoIsEmpty">اطلاعات راننده دریافت نشد</string>
 
     <string name="startDriving">شروع سفر</string>
     <string name="stopDriving">پایان سفر</string>

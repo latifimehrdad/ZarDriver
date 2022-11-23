@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.content.ContextCompat
@@ -17,8 +18,10 @@ import androidx.lifecycle.*
 import com.google.android.gms.location.*
 import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.R
+import com.zarholding.zardriver.model.response.TripModel
 import com.zarholding.zardriver.utility.CompanionValues
 import com.zarholding.zardriver.utility.EnumTripStatus
+import com.zarholding.zardriver.utility.LocationTool
 import com.zarholding.zardriver.view.activity.MainActivity
 import com.zarholding.zardriver.view.fragment.HomeFragment
 
@@ -34,8 +37,9 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     private var fusedLocationProvider: FusedLocationProviderClient? = null
 
-    private var serviceId: String? = null
     private var token: String? = null
+    private var tripModel: TripModel? = null
+    private var driverId: Int? = null
 
 
     //---------------------------------------------------------------------------------------------- onCreate
@@ -51,7 +55,8 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
     //---------------------------------------------------------------------------------------------- onStartCommand
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         token = intent?.extras?.getString(CompanionValues.spToken, null)
-        serviceId = intent?.extras?.getString(CompanionValues.spServiceId, null)
+        tripModel = intent?.extras?.getParcelable(CompanionValues.tripModel)
+        driverId = intent?.extras?.getInt(CompanionValues.driverId)
         signalRListener = SignalRListener.getInstance(this@TrackingService, token)
         startSignalR()
         return super.onStartCommand(intent, flags, startId)
@@ -85,6 +90,11 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- startLocationProvider
     private fun startLocationProvider() {
+
+        tripModel?.stations?.get(0)?.let {
+            Log.i("meri", "stationId = ${it.id}")
+            sendNotificationToServer(it.id)
+        }
         HomeFragment.tripStatus = EnumTripStatus.START
         fusedLocationProvider = LocationServices.getFusedLocationProviderClient(this)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -140,15 +150,48 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
                 location = locationList.last()
             location?.let {
                 if (signalRListener.isConnection)
-                    signalRListener.sendToServer(
-                        serviceId,
-                        it.latitude.toString(),
-                        it.longitude.toString()
-                    )
+                    sendToServer(it)
             }
         }
     }
     //---------------------------------------------------------------------------------------------- locationCallback
+
+
+    //---------------------------------------------------------------------------------------------- sendToServer
+    private fun sendToServer(currentLocation: Location) {
+        var stationId = -1
+        tripModel?.let {
+            stationId = LocationTool().checkLocationNearbyStation(it.stations, currentLocation)
+        }
+        if (stationId == -1)
+            sendPointToServer(currentLocation)
+        else
+            sendNotificationToServer(stationId)
+    }
+    //---------------------------------------------------------------------------------------------- sendToServer
+
+
+
+    //---------------------------------------------------------------------------------------------- sendPointToServer
+    private fun sendPointToServer(location: Location) {
+        signalRListener.sendToServer(
+            tripModel?.id,
+            driverId,
+            location.latitude.toString(),
+            location.longitude.toString()
+        )
+    }
+    //---------------------------------------------------------------------------------------------- sendPointToServer
+
+
+
+    //---------------------------------------------------------------------------------------------- sendNotificationToServer
+    private fun sendNotificationToServer(stationId : Int) {
+        signalRListener.NotificationToServer(tripModel?.id, stationId)
+    }
+    //---------------------------------------------------------------------------------------------- sendNotificationToServer
+
+
 
 
     //---------------------------------------------------------------------------------------------- onConnectToSignalR
@@ -167,7 +210,8 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- onReConnectToSignalR
     override fun onReConnectToSignalR() {
-        HomeFragment.tripStatus = EnumTripStatus.RECONNECT
+        if (HomeFragment.tripStatus != EnumTripStatus.STOP)
+            HomeFragment.tripStatus = EnumTripStatus.RECONNECT
     }
     //---------------------------------------------------------------------------------------------- onReConnectToSignalR
 
