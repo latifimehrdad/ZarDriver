@@ -14,8 +14,6 @@ data class DriverModel(
     val nationalCode : String?,
     val pelak : String?,
     val description : String?,
-    val companyCode : String?,
-    val companyName : String?,
     val carImage : String?,
     val carImageName : String?,
     val driverImage : String?,
@@ -23,8 +21,6 @@ data class DriverModel(
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
-        parcel.readString(),
-        parcel.readString(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
@@ -42,8 +38,6 @@ data class DriverModel(
         parcel.writeString(nationalCode)
         parcel.writeString(pelak)
         parcel.writeString(description)
-        parcel.writeString(companyCode)
-        parcel.writeString(companyName)
         parcel.writeString(carImage)
         parcel.writeString(carImageName)
         parcel.writeString(driverImage)
