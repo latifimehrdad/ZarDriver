@@ -1,4 +1,4 @@
-package com.zarholding.zardriver.view.extension
+package com.zarholding.zardriver.ext
 
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat

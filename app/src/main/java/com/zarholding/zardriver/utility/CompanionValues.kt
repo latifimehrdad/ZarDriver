@@ -7,7 +7,9 @@ package com.zarholding.zardriver.utility
 class CompanionValues {
 
     companion object {
-        const val spToken = "token"
+        const val TOKEN = "token"
+        const val userName = "userName"
+        const val passcode = "passcode"
         const val tripModel = "tripModel"
         const val driverModel = "driverModel"
         const val driverId = "driverId"

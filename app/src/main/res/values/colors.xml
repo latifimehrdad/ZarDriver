@@ -6,6 +6,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="primaryColor">#163c69</color>
     <color name="pageBack">#163c69</color>
     <color name="buttonLoading">#FFA200</color>
     <color name="cardStop">#D84E4E</color>

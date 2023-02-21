@@ -1,4 +1,4 @@
-package com.zarholding.zardriver.view.fragment
+package com.zarholding.zardriver.view.fragment.home
 
 import android.content.Context
 import android.content.Intent
@@ -7,19 +7,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.snackbar.Snackbar
-import com.zar.core.enums.EnumErrorType
-import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zar.core.tools.manager.InternetManager
 import com.zarholding.zardriver.R
+import com.zarholding.zardriver.ZarFragment
 import com.zarholding.zardriver.background.TrackingService
 import com.zarholding.zardriver.databinding.FragmentHomeBinding
 import com.zarholding.zardriver.model.response.TripModel
@@ -27,8 +22,6 @@ import com.zarholding.zardriver.model.response.driver.DriverModel
 import com.zarholding.zardriver.utility.CompanionValues
 import com.zarholding.zardriver.utility.EnumTripStatus
 import com.zarholding.zardriver.view.activity.MainActivity
-import com.zarholding.zardriver.viewmodel.TokenViewModel
-import com.zarholding.zardriver.viewmodel.TripDriverViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -40,46 +33,31 @@ import javax.inject.Inject
  */
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), RemoteErrorEmitter {
+class HomeFragment(override var layout: Int = R.layout.fragment_home)
+    : ZarFragment<FragmentHomeBinding>() {
 
     companion object {
         var chronometerBase = 0L
         var tripStatus = EnumTripStatus.STOP
     }
 
-    private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
-
+    private val homeViewModel: HomeViewModel by viewModels()
 
     @Inject
     lateinit var internetConnection: InternetManager
 
-    private val tripViewModel: TripDriverViewModel by viewModels()
-    private val tokenViewModel : TokenViewModel by viewModels()
-
-    lateinit var tripModel : TripModel
+    private lateinit var tripModel : TripModel
     private var job: Job? = null
     private var timerCounting = false
     private var driverModel : DriverModel? = null
 
 
-    //---------------------------------------------------------------------------------------------- onCreateView
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-    //---------------------------------------------------------------------------------------------- onCreateView
-
 
     //---------------------------------------------------------------------------------------------- onViewCreated
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        MainActivity.remoteErrorEmitter = this
-        binding.lifecycleOwner = viewLifecycleOwner
         driverModel = arguments?.getParcelable(CompanionValues.driverModel)
+        observeLiveDate()
         setListener()
         setStopDriving()
         checkServiceIsRun()
@@ -97,13 +75,30 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
 
 
-    //---------------------------------------------------------------------------------------------- onError
-    override fun onError(errorType: EnumErrorType, message: String) {
-        val snack = Snackbar.make(binding.constraintLayoutHome, message, 10 * 1000)
-        snack.setAction(getString(R.string.dismiss)) { snack.dismiss() }
-        snack.show()
+    //---------------------------------------------------------------------------------------------- observeLiveDate
+    private fun observeLiveDate() {
+        homeViewModel.errorLiveDate.observe(viewLifecycleOwner) {
+            setStopDriving()
+            showMessage(it.message)
+        }
+
+        homeViewModel.tripLiveData.observe(viewLifecycleOwner){
+            tripModel = it
+            startDriving()
+        }
+
     }
-    //---------------------------------------------------------------------------------------------- onError
+    //---------------------------------------------------------------------------------------------- observeLiveDate
+
+
+
+
+    //---------------------------------------------------------------------------------------------- showMessage
+    private fun showMessage(message: String) {
+        activity?.let { (it as MainActivity).showMessage(message) }
+    }
+    //---------------------------------------------------------------------------------------------- showMessage
+
 
 
     //---------------------------------------------------------------------------------------------- setListener
@@ -143,11 +138,11 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         if (activity == null)
             return
         if (!checkLocationEnable()) {
-            onError(EnumErrorType.UNKNOWN, getString(R.string.errorLocationIsOff))
+            showMessage(getString(R.string.errorLocationIsOff))
             return
         }
         if (!checkInternetConnected()) {
-            onError(EnumErrorType.UNKNOWN, getString(R.string.errorInternetIsOff))
+            showMessage(getString(R.string.errorInternetIsOff))
             return
         }
         requestStartTripDriver()
@@ -161,27 +156,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
         if (tripStatus == EnumTripStatus.STOP) {
             tripStatus = EnumTripStatus.WAITING
             setWaitingDriving()
-            tripViewModel.requestStartTripDriver(tokenViewModel.getBearerToken())
-                .observe(viewLifecycleOwner) { response ->
-                response?.let {
-                    if (it.hasError) {
-                        onError(EnumErrorType.UNKNOWN, it.message)
-                        tripStatus = EnumTripStatus.STOP
-                        setStopDriving()
-                    } else {
-                        it.data?.let {dataResponse ->
-                            tripModel = dataResponse
-                            startDriving()
-                        } ?: run {
-                            tripStatus = EnumTripStatus.STOP
-                            setStopDriving()
-                        }
-                    }
-                } ?: run {
-                    tripStatus = EnumTripStatus.STOP
-                    setStopDriving()
-                }
-            }
+            homeViewModel.requestStartTripDriver()
         }
     }
     //---------------------------------------------------------------------------------------------- requestStartTripDriver
@@ -211,7 +186,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     //---------------------------------------------------------------------------------------------- startServiceBackground
     private fun startServiceBackground() {
         val intent = Intent(requireActivity(), TrackingService::class.java)
-        intent.putExtra(CompanionValues.spToken, tokenViewModel.getToken())
+        intent.putExtra(CompanionValues.TOKEN, homeViewModel.getToken())
         intent.putExtra(CompanionValues.tripModel, tripModel)
         intent.putExtra(CompanionValues.driverId, driverModel?.id)
         requireActivity().startForegroundService(intent)
@@ -286,6 +261,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
 
     //---------------------------------------------------------------------------------------------- setStopDriving
     private fun setStopDriving() {
+        tripStatus = EnumTripStatus.STOP
         binding.imageViewDriving.setBackgroundResource(R.drawable.back_disconnect_button)
         stopAnimationConnected()
         binding.textViewDriving.text = getString(R.string.startDriving)
@@ -397,9 +373,7 @@ class HomeFragment : Fragment(), RemoteErrorEmitter {
     override fun onDestroyView() {
         super.onDestroyView()
         job?.cancel()
-        _binding = null
     }
     //---------------------------------------------------------------------------------------------- onDestroyView
-
 
 }

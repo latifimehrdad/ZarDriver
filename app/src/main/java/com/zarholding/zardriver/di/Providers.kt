@@ -1,8 +1,6 @@
-package com.zarholding.zardriver.hilt
+package com.zarholding.zardriver.di
 
-import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.api.ApiInterface9090
-import com.zarholding.zardriver.view.activity.MainActivity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,16 +26,6 @@ class Providers {
         return "http://192.168.50.153:9090"
     }
     //---------------------------------------------------------------------------------------------- provideBaseUrl
-
-
-    //---------------------------------------------------------------------------------------------- provideRemoteErrorEmitter
-    @Provides
-    @Singleton
-    fun provideRemoteErrorEmitter() : RemoteErrorEmitter {
-        return MainActivity()
-    }
-    //---------------------------------------------------------------------------------------------- provideRemoteErrorEmitter
-
 
 
     //---------------------------------------------------------------------------------------------- provideApiService

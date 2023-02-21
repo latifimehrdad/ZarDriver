@@ -4,6 +4,7 @@ import com.zarholding.zardriver.model.request.LoginRequestModel
 import com.zarholding.zardriver.model.response.LoginResponseModel
 import com.zarholding.zardriver.model.response.TripResponseModel
 import com.zarholding.zardriver.model.response.driver.DriverResponseModel
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -25,17 +26,17 @@ interface ApiInterface9090 {
     @POST("$driver/login-driver")
     suspend fun requestLogin(
         @Body login: LoginRequestModel
-    ): LoginResponseModel
+    ): Response<LoginResponseModel>
 
 
     @GET("$driver/start-trip-driver")
     suspend fun requestStartTripDriver(
         @Header("Authorization") token : String
-    ) : TripResponseModel
+    ) : Response<TripResponseModel>
 
     @GET("$driver/get-driver-info")
     suspend fun requestGetDriverInfo(
         @Header("Authorization") token : String
-    ) : DriverResponseModel
+    ): Response<DriverResponseModel>
 
 }

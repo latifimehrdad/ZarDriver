@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.zarholding.zardriver.view.fragment.SplashFragment"
+        android:name="com.zarholding.zardriver.view.fragment.splash.SplashFragment"
         android:label="SplashFragment" >
 
         <action
@@ -31,16 +31,26 @@
 
     <fragment
         android:id="@+id/LoginFragment"
-        android:name="com.zarholding.zardriver.view.fragment.LoginFragment"
+        android:name="com.zarholding.zardriver.view.fragment.login.LoginFragment"
         android:label="LoginFragment"/>
 
 
     <fragment
         android:id="@+id/HomeFragment"
-        android:name="com.zarholding.zardriver.view.fragment.HomeFragment"
+        android:name="com.zarholding.zardriver.view.fragment.home.HomeFragment"
         android:label="HomeFragment"
         />
 
+
+    <action
+        android:id="@+id/action_goto_SplashFragment"
+        app:destination="@id/splashFragment"
+        app:enterAnim="@anim/slide_in_left"
+        app:exitAnim="@anim/slide_out_right"
+        app:popEnterAnim="@anim/slide_in_right"
+        app:popExitAnim="@anim/slide_out_left"
+        app:popUpTo="@id/splashFragment"
+        app:launchSingleTop="true"/>
 
 
 </navigation>

@@ -16,21 +16,19 @@ import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.google.android.gms.location.*
-import com.zar.core.tools.api.interfaces.RemoteErrorEmitter
 import com.zarholding.zardriver.R
 import com.zarholding.zardriver.model.response.TripModel
 import com.zarholding.zardriver.utility.CompanionValues
 import com.zarholding.zardriver.utility.EnumTripStatus
 import com.zarholding.zardriver.utility.LocationTool
-import com.zarholding.zardriver.view.activity.MainActivity
-import com.zarholding.zardriver.view.fragment.HomeFragment
+import com.zarholding.zardriver.view.fragment.home.HomeFragment
 
 
 /**
  * Created by m-latifi on 11/9/2022.
  */
 
-class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmitter {
+class TrackingService : LifecycleService(), RemoteSignalREmitter {
 
     private var location: Location? = null
     lateinit var signalRListener: SignalRListener
@@ -46,7 +44,6 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
     override fun onCreate() {
         super.onCreate()
         HomeFragment.tripStatus = EnumTripStatus.WAITING
-        MainActivity.remoteErrorEmitter = this
         startForeground()
     }
     //---------------------------------------------------------------------------------------------- onCreate
@@ -54,7 +51,7 @@ class TrackingService : LifecycleService(), RemoteErrorEmitter, RemoteSignalREmi
 
     //---------------------------------------------------------------------------------------------- onStartCommand
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        token = intent?.extras?.getString(CompanionValues.spToken, null)
+        token = intent?.extras?.getString(CompanionValues.TOKEN, null)
         tripModel = intent?.extras?.getParcelable(CompanionValues.tripModel)
         driverId = intent?.extras?.getInt(CompanionValues.driverId)
         signalRListener = SignalRListener.getInstance(this@TrackingService, token)

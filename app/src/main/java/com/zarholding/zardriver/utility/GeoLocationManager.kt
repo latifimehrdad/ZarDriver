@@ -4,6 +4,7 @@ package com.zarholding.zardriver.utility
  * Created by m-latifi on 11/15/2022.
  */
 
+/*
 import android.content.Context
 import android.os.Looper
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -56,4 +57,4 @@ class GeoLocationManager(context: Context) {
         const val UPDATE_INTERVAL_MILLISECONDS: Long = 0
         const val FASTEST_UPDATE_INTERVAL_MILLISECONDS = UPDATE_INTERVAL_MILLISECONDS / 2
     }
-}
+}*/

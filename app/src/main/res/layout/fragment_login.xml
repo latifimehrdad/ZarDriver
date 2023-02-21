@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.zarholding.zardriver.viewmodel.LoginViewModel" />
+            type="com.zarholding.zardriver.view.fragment.login.LoginViewModel" />
     </data>
 
     <ScrollView
@@ -82,7 +82,7 @@
                     android:maxLength="20"
                     android:textColor="@color/pageBack"
                     android:singleLine="true"
-                    android:text="@={viewModel.passcode}"
+                    android:text="@={viewModel.password}"
                     android:textSize="@dimen/_10sdp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -111,7 +111,7 @@
                 android:src="@drawable/solid_white"
                 app:tint="@color/buttonLoading" />
 
-            <com.google.android.material.button.MaterialButton
+            <com.zarholding.zardriver.view.custom.ZarButton
                 android:id="@+id/buttonLogin"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -124,10 +124,7 @@
                 android:paddingBottom="@dimen/_5sdp"
                 android:fontFamily="@font/vazir_normal"
                 app:cornerRadius="@dimen/_5sdp"
-                android:textColor="@color/white"
-                android:text='@{viewModel.loadingLiveDate ? @string/bePatient : @string/loginToAccount}'
-                app:showProgress="@{viewModel.loadingLiveDate}"/>
-
+                android:textColor="@color/white" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
