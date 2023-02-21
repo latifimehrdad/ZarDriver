@@ -1,4 +1,4 @@
-package com.zarholding.zardriver.utility
+package com.zarholding.zardriver.tools
 
 import android.location.Location
 import android.location.LocationManager

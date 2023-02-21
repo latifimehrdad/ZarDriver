@@ -9,7 +9,7 @@ import com.zarholding.zardriver.R
 import com.zarholding.zardriver.ZarFragment
 import com.zarholding.zardriver.databinding.FragmentSplashBinding
 import com.zarholding.zardriver.model.response.driver.DriverModel
-import com.zarholding.zardriver.utility.CompanionValues
+import com.zarholding.zardriver.tools.CompanionValues
 import com.zarholding.zardriver.view.activity.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*

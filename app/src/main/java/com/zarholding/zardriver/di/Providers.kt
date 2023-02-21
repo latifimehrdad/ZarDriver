@@ -1,12 +1,11 @@
 package com.zarholding.zardriver.di
 
-import com.zarholding.zardriver.api.ApiInterface9090
+import com.zarholding.zardriver.model.api.ApiInterface9090
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
-import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -21,7 +20,6 @@ class Providers {
     //---------------------------------------------------------------------------------------------- provideBaseUrl
     @Provides
     @Singleton
-    @Named("Normal")
     fun provideBaseUrl(): String {
         return "http://192.168.50.153:9090"
     }
@@ -31,7 +29,7 @@ class Providers {
     //---------------------------------------------------------------------------------------------- provideApiService
     @Provides
     @Singleton
-    fun provideApiService(@Named("Normal") retrofit: Retrofit): ApiInterface9090 {
+    fun provideApiService(retrofit: Retrofit): ApiInterface9090 {
         return retrofit.create(ApiInterface9090::class.java)
     }
     //---------------------------------------------------------------------------------------------- provideApiService

@@ -122,6 +122,7 @@
                 android:textSize="@dimen/_12sdp"
                 android:paddingTop="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_5sdp"
+                android:text="@string/loginToAccount"
                 android:fontFamily="@font/vazir_normal"
                 app:cornerRadius="@dimen/_5sdp"
                 android:textColor="@color/white" />

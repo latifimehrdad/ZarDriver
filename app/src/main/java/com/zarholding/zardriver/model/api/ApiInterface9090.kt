@@ -1,4 +1,4 @@
-package com.zarholding.zardriver.api
+package com.zarholding.zardriver.model.api
 
 import com.zarholding.zardriver.model.request.LoginRequestModel
 import com.zarholding.zardriver.model.response.LoginResponseModel

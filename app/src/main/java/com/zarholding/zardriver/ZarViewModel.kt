@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.zar.core.enums.EnumApiError
 import com.zar.core.models.ErrorApiModel
 import com.zar.core.tools.api.checkResponseError
-import com.zarholding.zardriver.utility.SingleLiveEvent
+import com.zarholding.zardriver.tools.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import retrofit2.Response

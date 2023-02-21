@@ -32,7 +32,7 @@
         </activity>
 
         <service
-            android:name=".background.TrackingService"
+            android:name=".tools.background.TrackingService"
             android:foregroundServiceType="location"
             android:enabled="true"
             android:exported="false" />

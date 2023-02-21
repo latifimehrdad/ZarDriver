@@ -6,7 +6,7 @@ import com.zarholding.zardriver.di.ResourcesProvider
 import com.zarholding.zardriver.model.repository.DriverRepository
 import com.zarholding.zardriver.model.repository.TokenRepository
 import com.zarholding.zardriver.model.response.driver.DriverModel
-import com.zarholding.zardriver.utility.SingleLiveEvent
+import com.zarholding.zardriver.tools.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

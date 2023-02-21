@@ -8,8 +8,8 @@ import com.zarholding.zardriver.ZarViewModel
 import com.zarholding.zardriver.di.ResourcesProvider
 import com.zarholding.zardriver.model.request.LoginRequestModel
 import com.zarholding.zardriver.model.repository.LoginRepository
-import com.zarholding.zardriver.utility.CompanionValues
-import com.zarholding.zardriver.utility.SingleLiveEvent
+import com.zarholding.zardriver.tools.CompanionValues
+import com.zarholding.zardriver.tools.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

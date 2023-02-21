@@ -1,4 +1,4 @@
-package com.zarholding.zardriver.background;
+package com.zarholding.zardriver.tools.background;
 
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;

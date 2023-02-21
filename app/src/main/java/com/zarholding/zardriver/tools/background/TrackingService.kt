@@ -1,4 +1,4 @@
-package com.zarholding.zardriver.background
+package com.zarholding.zardriver.tools.background
 
 import android.Manifest
 import android.app.Notification
@@ -18,9 +18,9 @@ import androidx.lifecycle.*
 import com.google.android.gms.location.*
 import com.zarholding.zardriver.R
 import com.zarholding.zardriver.model.response.TripModel
-import com.zarholding.zardriver.utility.CompanionValues
-import com.zarholding.zardriver.utility.EnumTripStatus
-import com.zarholding.zardriver.utility.LocationTool
+import com.zarholding.zardriver.tools.CompanionValues
+import com.zarholding.zardriver.tools.EnumTripStatus
+import com.zarholding.zardriver.tools.LocationTool
 import com.zarholding.zardriver.view.fragment.home.HomeFragment
 
 

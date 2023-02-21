@@ -1,7 +1,7 @@
 package com.zarholding.zardriver.model.repository
 
 import android.content.SharedPreferences
-import com.zarholding.zardriver.utility.CompanionValues
+import com.zarholding.zardriver.tools.CompanionValues
 import javax.inject.Inject
 
 /**
