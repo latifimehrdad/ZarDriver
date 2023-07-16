@@ -1,4 +1,4 @@
-package com.zarholding.zardriver.model.response
+package com.zarholding.zardriver.model.data.response
 
 import android.os.Parcel
 import android.os.Parcelable

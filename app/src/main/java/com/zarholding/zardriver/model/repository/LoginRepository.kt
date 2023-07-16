@@ -2,7 +2,7 @@ package com.zarholding.zardriver.model.repository
 
 import com.zar.core.tools.api.apiCall
 import com.zarholding.zardriver.model.api.ApiInterface9090
-import com.zarholding.zardriver.model.request.LoginRequestModel
+import com.zarholding.zardriver.model.data.request.LoginRequestModel
 import javax.inject.Inject
 
 /**

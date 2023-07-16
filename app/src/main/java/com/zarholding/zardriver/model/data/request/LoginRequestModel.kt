@@ -1,4 +1,4 @@
-package com.zarholding.zardriver.model.request
+package com.zarholding.zardriver.model.data.request
 
 /**
  * Created by m-latifi on 11/9/2022.

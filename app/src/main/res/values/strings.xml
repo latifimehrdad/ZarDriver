@@ -9,7 +9,7 @@
     <string name="loginToAccount">ورود به حساب کاربری</string>
     <string name="bePatient">شکیبا باشید …</string>
     <string name="appIsRunning">سرویس زر در حال اجرا است</string>
-
+    <string name="dataReceivedIsEmpty">اطلاعات دریافت شده خالی است</string>
     <string name="dismiss">بستن</string>
     <string name="userNameValidationFailed">نام کاربری را صحیح وارد نمایید</string>
     <string name="passwordValidationFailed">رمز ورود را وارد نمایید</string>

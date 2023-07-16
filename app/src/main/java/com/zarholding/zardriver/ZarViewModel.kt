@@ -4,9 +4,12 @@ import androidx.lifecycle.ViewModel
 import com.zar.core.enums.EnumApiError
 import com.zar.core.models.ErrorApiModel
 import com.zar.core.tools.api.checkResponseError
+import com.zarholding.zardriver.di.ResourcesProvider
+import com.zarholding.zardriver.model.data.response.GeneralResponse
 import com.zarholding.zardriver.tools.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -17,24 +20,54 @@ import javax.inject.Inject
 @HiltViewModel
 open class ZarViewModel @Inject constructor() : ViewModel() {
 
-    var job: Job? = null
-    val errorLiveDate : SingleLiveEvent<ErrorApiModel> by lazy { SingleLiveEvent<ErrorApiModel>() }
+    @Inject
+    lateinit var resourcesProvider: ResourcesProvider
+    val errorLiveDate: SingleLiveEvent<ErrorApiModel> by lazy { SingleLiveEvent<ErrorApiModel>() }
+
+
+    //---------------------------------------------------------------------------------------------- callApi
+    suspend fun <T : Any> callApi(
+        response: Response<GeneralResponse<T?>>?,
+        showMessageAfterSuccessResponse: Boolean = false
+    ): T? {
+        if (response?.isSuccessful == true) {
+            val body = response.body()
+            body?.let { generalResponse ->
+                if (generalResponse.hasError || generalResponse.data == null)
+                    setMessage(generalResponse.message)
+                else {
+                    if (showMessageAfterSuccessResponse)
+                        setMessage(generalResponse.message)
+                    return generalResponse.data
+                }
+            } ?: run {
+                setMessage(
+                    resourcesProvider.getString(
+                        R.string.dataReceivedIsEmpty
+                    )
+                )
+            }
+        } else setMessage(response)
+        return null
+    }
+    //---------------------------------------------------------------------------------------------- callApi
 
 
     //---------------------------------------------------------------------------------------------- setError
-    fun setMessage(response: Response<*>?) {
-        checkResponseError(response, errorLiveDate)
-        job?.cancel()
+    suspend fun setMessage(response: Response<*>?) {
+        withContext(Main) {
+            checkResponseError(response, errorLiveDate)
+        }
     }
     //---------------------------------------------------------------------------------------------- setError
 
 
     //---------------------------------------------------------------------------------------------- setMessage
-    fun setMessage(message : String) {
+    fun setMessage(message: String) {
         errorLiveDate.postValue(ErrorApiModel(EnumApiError.Error, message))
-        job?.cancel()
     }
     //---------------------------------------------------------------------------------------------- setMessage
+
 
 
     //---------------------------------------------------------------------------------------------- exceptionHandler
@@ -43,12 +76,5 @@ open class ZarViewModel @Inject constructor() : ViewModel() {
     }
     //---------------------------------------------------------------------------------------------- exceptionHandler
 
-
-    //---------------------------------------------------------------------------------------------- onCleared
-    override fun onCleared() {
-        super.onCleared()
-        job?.cancel()
-    }
-    //---------------------------------------------------------------------------------------------- onCleared
 
 }

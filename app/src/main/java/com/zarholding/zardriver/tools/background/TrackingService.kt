@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.google.android.gms.location.*
 import com.zarholding.zardriver.R
-import com.zarholding.zardriver.model.response.TripModel
+import com.zarholding.zardriver.model.data.response.TripModel
 import com.zarholding.zardriver.tools.CompanionValues
 import com.zarholding.zardriver.tools.EnumTripStatus
 import com.zarholding.zardriver.tools.LocationTool

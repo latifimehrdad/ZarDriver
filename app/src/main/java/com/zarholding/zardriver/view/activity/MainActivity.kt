@@ -55,12 +55,20 @@ class MainActivity : AppCompatActivity() {
 
     //---------------------------------------------------------------------------------------------- checkLocationPermission
     private fun checkLocationPermission() {
-
-        Dexter.withContext(this)
-            .withPermissions(
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableListOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        } else {
+            mutableListOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
+        }
+        Dexter.withContext(this)
+            .withPermissions(permission)
             .withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
                     requestBackgroundLocationPermission()

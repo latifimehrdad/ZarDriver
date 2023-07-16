@@ -3,7 +3,7 @@ package com.zarholding.zardriver.tools
 import android.location.Location
 import android.location.LocationManager
 import android.util.Log
-import com.zarholding.zardriver.model.response.TripStationModel
+import com.zarholding.zardriver.model.data.response.TripStationModel
 
 /**
  * Created by m-latifi on 11/23/2022.
