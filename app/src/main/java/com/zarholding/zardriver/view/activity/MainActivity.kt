@@ -3,6 +3,8 @@ package com.zarholding.zardriver.view.activity
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
+import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -110,11 +112,14 @@ class MainActivity : AppCompatActivity() {
 
     //---------------------------------------------------------------------------------------------- showMessage
     fun showMessage(message: String) {
-        val snack = Snackbar.make(binding.constraintLayoutParent, message, 5 * 1000)
+        val snack = Snackbar.make(binding.constraintLayoutParent, message, 3 * 1000)
         snack.setBackgroundTint(resources.getColor(R.color.primaryColor, theme))
         snack.setTextColor(resources.getColor(R.color.white, theme))
         snack.setAction(getString(R.string.dismiss)) { snack.dismiss() }
         snack.setActionTextColor(resources.getColor(R.color.buttonLoading, theme))
+        val view = snack.view
+        val params = view.layoutParams as FrameLayout.LayoutParams
+        params.gravity = Gravity.TOP
         snack.show()
     }
     //---------------------------------------------------------------------------------------------- showMessage

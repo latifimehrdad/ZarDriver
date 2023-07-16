@@ -39,6 +39,13 @@ class TrackingService : LifecycleService(), RemoteSignalREmitter {
     private var tripModel: TripModel? = null
     private var driverId: Int? = null
 
+    //---------------------------------------------------------------------------------------------- locationRequest
+    private val locationRequest: LocationRequest = LocationRequest.Builder(
+        Priority.PRIORITY_HIGH_ACCURACY, 1
+    ).build()
+    //---------------------------------------------------------------------------------------------- locationRequest
+
+
 
     //---------------------------------------------------------------------------------------------- onCreate
     override fun onCreate() {
@@ -93,10 +100,10 @@ class TrackingService : LifecycleService(), RemoteSignalREmitter {
             sendNotificationToServer(it.id)
         }
         HomeFragment.tripStatus = EnumTripStatus.START
-        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(this)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
+            fusedLocationProvider = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationProvider?.requestLocationUpdates(
                 locationRequest,
                 locationCallback,
@@ -124,14 +131,6 @@ class TrackingService : LifecycleService(), RemoteSignalREmitter {
     }
     //---------------------------------------------------------------------------------------------- createNotificationChannel
 
-
-    //---------------------------------------------------------------------------------------------- locationRequest
-    private val locationRequest: LocationRequest = LocationRequest.create().apply {
-        interval = 1
-        fastestInterval = 1
-        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-    }
-    //---------------------------------------------------------------------------------------------- locationRequest
 
 
     //---------------------------------------------------------------------------------------------- locationCallback
