@@ -41,6 +41,19 @@
         android:label="HomeFragment"
         />
 
+    <fragment
+        android:id="@+id/downloadUpdateFragment"
+        android:name="com.zarholding.zardriver.view.fragment.download.DownloadUpdateFragment" />
+
+    <action
+        android:id="@+id/action_goto_DownloadUpdateFragment"
+        app:destination="@id/downloadUpdateFragment"
+        app:enterAnim="@anim/slide_in_left"
+        app:exitAnim="@anim/slide_out_right"
+        app:popEnterAnim="@anim/slide_in_right"
+        app:popExitAnim="@anim/slide_out_left"
+        app:popUpTo="@id/downloadUpdateFragment"
+        app:launchSingleTop="true"/>
 
     <action
         android:id="@+id/action_goto_SplashFragment"

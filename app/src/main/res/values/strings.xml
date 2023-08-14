@@ -22,6 +22,9 @@
     <string name="errorInternetIsOff">اینترنت دستگاه خود را چک کنید</string>
     <string name="driverInfoIsEmpty">اطلاعات راننده دریافت نشد</string>
     <string name="tripInfoIsEmpty">اطلاعات سفر دریافت نشد</string>
+    <string name="internalMemoryIsFull">حافظه دستگاه شما پر شده است</string>
+    <string name="doYouWantToUpdateApp">آیا برای بروزرسانی برنامه مطمئن هستید؟</string>
+    <string name="tryAgain">تلاش دوباره</string>
 
     <string name="startDriving">شروع سفر</string>
     <string name="stopDriving">پایان سفر</string>

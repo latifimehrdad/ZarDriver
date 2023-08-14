@@ -19,8 +19,8 @@ public class SignalRListener {
     //---------------------------------------------------------------------------------------------- SignalRListener
     public SignalRListener(RemoteSignalREmitter remoteSignalREmitter, String token) {
         this.remoteSignalREmitter = remoteSignalREmitter;
-        String url = "http://192.168.50.153:8091/realtimenotification?access_token=" + token;
-//        String url = "http://5.160.125.98:1364/realtimenotification?access_token=" + token;
+//        String url = "http://192.168.50.153:8091/realtimenotification?access_token=" + token;
+        String url = "http://5.160.125.98:1364/realtimenotification?access_token=" + token;
         hubConnection = HubConnectionBuilder
                 .create(url)
                 .build();

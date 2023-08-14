@@ -13,11 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.zar.core.tools.manager.PermissionManager
 import com.zarholding.zardriver.R
 import com.zarholding.zardriver.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,6 +23,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Created by m-latifi on 11/8/2022.
@@ -36,11 +33,12 @@ import kotlinx.coroutines.withContext
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
-    private val requestLocation = 99
-    private val requestBackgroundLocation = 66
 
     private val mainViewModel: MainViewModel by viewModels()
     private var navController: NavController? = null
+
+    @Inject
+    lateinit var permissionManager: PermissionManager
 
     //---------------------------------------------------------------------------------------------- onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,64 +48,9 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment?
         navController = navHostFragment?.navController
-        checkLocationPermission()
     }
     //---------------------------------------------------------------------------------------------- onCreate
 
-
-    //---------------------------------------------------------------------------------------------- checkLocationPermission
-    private fun checkLocationPermission() {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            mutableListOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.POST_NOTIFICATIONS
-            )
-        } else {
-            mutableListOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        }
-        Dexter.withContext(this)
-            .withPermissions(permission)
-            .withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
-                    requestBackgroundLocationPermission()
-                }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    p0: MutableList<PermissionRequest>?,
-                    p1: PermissionToken?
-                ) {
-
-                }
-
-            })
-            .check()
-    }
-    //---------------------------------------------------------------------------------------------- checkLocationPermission
-
-
-    //---------------------------------------------------------------------------------------------- requestBackgroundLocationPermission
-    private fun requestBackgroundLocationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                ),
-                requestBackgroundLocation
-            )
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                requestLocation
-            )
-        }
-    }
-    //---------------------------------------------------------------------------------------------- requestBackgroundLocationPermission
 
 
     //---------------------------------------------------------------------------------------------- showMessage
@@ -131,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(IO).launch {
             delay(500)
             withContext(Main) {
-                gotoFragment(R.id.action_goto_SplashFragment)
+                navController?.navigate(R.id.action_goto_SplashFragment, null)
             }
         }
     }
@@ -143,12 +86,5 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.deleteAllData()
     }
     //---------------------------------------------------------------------------------------------- deleteAllData
-
-
-    //---------------------------------------------------------------------------------------------- gotoFragment
-    private fun gotoFragment(fragment: Int) {
-        navController?.navigate(fragment, null)
-    }
-    //---------------------------------------------------------------------------------------------- gotoFragment
 
 }

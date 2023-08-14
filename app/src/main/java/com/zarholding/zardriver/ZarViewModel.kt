@@ -54,16 +54,16 @@ open class ZarViewModel @Inject constructor() : ViewModel() {
 
 
     //---------------------------------------------------------------------------------------------- setError
-    suspend fun setMessage(response: Response<*>?) {
+    private suspend fun setMessage(response: Response<*>?) {
         withContext(Main) {
-            checkResponseError(response, errorLiveDate)
+            errorLiveDate.postValue(checkResponseError(response))
         }
     }
     //---------------------------------------------------------------------------------------------- setError
 
 
     //---------------------------------------------------------------------------------------------- setMessage
-    fun setMessage(message: String) {
+    private fun setMessage(message: String) {
         errorLiveDate.postValue(ErrorApiModel(EnumApiError.Error, message))
     }
     //---------------------------------------------------------------------------------------------- setMessage
