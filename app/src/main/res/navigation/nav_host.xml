@@ -6,27 +6,7 @@
     <fragment
         android:id="@+id/splashFragment"
         android:name="com.zarholding.zardriver.view.fragment.splash.SplashFragment"
-        android:label="SplashFragment" >
-
-        <action
-            android:id="@+id/action_splashFragment_to_loginFragment"
-            app:destination="@id/LoginFragment"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_right"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_left"/>
-
-        <action
-            android:id="@+id/action_splashFragment_to_HomeFragment"
-            app:destination="@id/HomeFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/HomeFragment"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_right"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_left"/>
-
-    </fragment>
+        android:label="SplashFragment" />
 
 
     <fragment
@@ -65,5 +45,24 @@
         app:popUpTo="@id/splashFragment"
         app:launchSingleTop="true"/>
 
+
+    <action
+        android:id="@+id/action_goto_to_HomeFragment"
+        app:destination="@id/HomeFragment"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/HomeFragment"
+        app:enterAnim="@anim/slide_in_left"
+        app:exitAnim="@anim/slide_out_right"
+        app:popEnterAnim="@anim/slide_in_right"
+        app:popExitAnim="@anim/slide_out_left"/>
+
+
+    <action
+        android:id="@+id/action_goto_to_loginFragment"
+        app:destination="@id/LoginFragment"
+        app:enterAnim="@anim/slide_in_left"
+        app:exitAnim="@anim/slide_out_right"
+        app:popEnterAnim="@anim/slide_in_right"
+        app:popExitAnim="@anim/slide_out_left"/>
 
 </navigation>

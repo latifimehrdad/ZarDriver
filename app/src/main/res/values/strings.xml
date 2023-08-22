@@ -25,6 +25,7 @@
     <string name="internalMemoryIsFull">حافظه دستگاه شما پر شده است</string>
     <string name="doYouWantToUpdateApp">آیا برای بروزرسانی برنامه مطمئن هستید؟</string>
     <string name="tryAgain">تلاش دوباره</string>
+    <string name="pleaseCheckYouConnection">لطفا اینترنت دستگاه خود را چک کنید</string>
 
     <string name="startDriving">شروع سفر</string>
     <string name="stopDriving">پایان سفر</string>

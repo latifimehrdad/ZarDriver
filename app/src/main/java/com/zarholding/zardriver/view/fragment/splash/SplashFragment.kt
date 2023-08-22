@@ -38,9 +38,6 @@ class SplashFragment(override var layout: Int = R.layout.fragment_splash):
     @Inject
     lateinit var permissionManager: PermissionManager
 
-    private val requestLocation = 99
-    private val requestBackgroundLocation = 66
-
 
     //---------------------------------------------------------------------------------------------- onViewCreated
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -212,7 +209,7 @@ class SplashFragment(override var layout: Int = R.layout.fragment_splash):
         job = CoroutineScope(Dispatchers.IO).launch {
             delay(2000)
             withContext(Main) {
-                findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+                findNavController().navigate(R.id.action_goto_to_loginFragment)
             }
         }
     }
@@ -226,7 +223,7 @@ class SplashFragment(override var layout: Int = R.layout.fragment_splash):
             withContext(Main) {
                 val bundle = Bundle()
                 bundle.putParcelable(CompanionValues.driverModel, driverModel)
-                findNavController().navigate(R.id.action_splashFragment_to_HomeFragment, bundle)
+                findNavController().navigate(R.id.action_goto_to_HomeFragment, bundle)
             }
         }
     }

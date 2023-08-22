@@ -211,7 +211,7 @@ class HomeFragment(override var layout: Int = R.layout.fragment_home)
     //---------------------------------------------------------------------------------------------- checkServiceIsRun
     private fun checkServiceIsRun() {
         job = CoroutineScope(IO).launch {
-            delay(1000)
+            delay(1500)
             withContext(Main) {
                 when (tripStatus) {
                     EnumTripStatus.WAITING, EnumTripStatus.CONNECTING -> setWaitingDriving()

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.zar.core.enums.EnumApiError
 import com.zar.core.models.ErrorApiModel
 import com.zar.core.tools.api.checkResponseError
+import com.zarholding.zardriver.di.Providers
 import com.zarholding.zardriver.di.ResourcesProvider
 import com.zarholding.zardriver.model.data.response.GeneralResponse
 import com.zarholding.zardriver.tools.SingleLiveEvent
@@ -72,9 +73,16 @@ open class ZarViewModel @Inject constructor() : ViewModel() {
 
     //---------------------------------------------------------------------------------------------- exceptionHandler
     fun exceptionHandler() = CoroutineExceptionHandler { _, throwable ->
-        throwable.localizedMessage?.let { setMessage(it) }
+        CoroutineScope(Main).launch {
+            throwable.localizedMessage?.let {
+                val url = Providers.url.substringAfterLast("/").substringBefore(":")
+                if (it.contains(url))
+                    setMessage(resourcesProvider.getString(R.string.pleaseCheckYouConnection))
+                else
+                    setMessage(it)
+            }
+        }
     }
     //---------------------------------------------------------------------------------------------- exceptionHandler
-
 
 }
